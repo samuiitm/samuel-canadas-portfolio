@@ -1,13 +1,27 @@
 ---
-import TechnicalStatus from '../components/TechnicalStatus';
+import Contact from '../components/Contact.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import InternationalNote from '../components/InternationalNote.astro';
+import Journey from '../components/Journey.astro';
+import PersonalPlaceholder from '../components/PersonalPlaceholder.astro';
+import ProjectShowcase from '../components/ProjectShowcase';
+import ScrollStatement from '../components/ScrollStatement.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="Samuel Cañadas — Portfolio V2" description="Base técnica del portfolio profesional de Samuel Cañadas.">
+<BaseLayout
+	title="Samuel Cañadas — Portfolio"
+	description="Portfolio de Samuel Cañadas, Marketing Digital & Creativo y Desarrollo Web."
+>
+	<Header />
 	<main>
-		<h1>Samuel Cañadas</h1>
-		<p>Portfolio V2</p>
-		<p>Astro + React + Motion</p>
-		<TechnicalStatus client:load />
+		<Hero />
+		<ScrollStatement />
+		<ProjectShowcase client:load />
+		<InternationalNote />
+		<Journey />
+		<PersonalPlaceholder />
+		<Contact />
 	</main>
 </BaseLayout>

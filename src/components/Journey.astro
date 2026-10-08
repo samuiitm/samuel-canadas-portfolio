@@ -1,0 +1,28 @@
+---
+const moments = [
+	{ label: 'Base', title: 'Informática', text: 'El primer lenguaje para entender cómo funcionan las cosas.' },
+	{ label: 'Apertura', title: 'Portugal', text: 'Diseño, comunicación y una forma más visual de contar.' },
+	{ label: 'Construcción', title: 'DAW', text: 'Convertir ideas y sistemas en productos que se pueden usar.' },
+	{ label: 'Contexto real', title: 'Malta', text: 'Trabajar en inglés, adaptarse y tomar decisiones con autonomía.' },
+	{ label: 'Cruce', title: 'Nova Unió + NFL', text: 'Dos proyectos reales; dos formas de trabajar que ya no van separadas.' },
+];
+---
+
+<section class="journey section-shell" id="about" aria-labelledby="journey-title">
+	<header class="section-heading">
+		<p class="eyebrow">03 — Recorrido</p>
+		<h2 id="journey-title">No fue una línea recta.<br />Fue encontrando el punto medio.</h2>
+	</header>
+	<ol class="journey__list">
+		{moments.map((moment, index) => (
+			<li>
+				<span class="journey__number">0{index + 1}</span>
+				<div>
+					<p class="journey__label">{moment.label}</p>
+					<h3>{moment.title}</h3>
+				</div>
+				<p>{moment.text}</p>
+			</li>
+		))}
+	</ol>
+</section>

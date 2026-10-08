@@ -1,0 +1,20 @@
+---
+import ThemeToggle from './ThemeToggle';
+---
+
+<header class="site-header">
+	<div class="site-header__inner container-wide">
+		<a class="site-header__identity" href="#top">Samuel Cañadas</a>
+		<nav class="site-header__nav" aria-label="Navegación principal">
+			<a href="#work">Work</a>
+			<a href="#about">About</a>
+			<a href="#contact">Contact</a>
+		</nav>
+		<div class="site-header__controls">
+			<span class="language-toggle" aria-label="Idioma actual: español">
+				<strong>ES</strong><span aria-hidden="true">/</span><span title="Versión inglesa pendiente">EN</span>
+			</span>
+			<ThemeToggle client:load />
+		</div>
+	</div>
+</header>

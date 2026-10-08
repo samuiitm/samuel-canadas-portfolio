@@ -1,0 +1,65 @@
+<script>
+	import Lenis from 'lenis';
+
+	declare global {
+		interface Window {
+			__portfolioLenis?: Lenis;
+			__portfolioLenisCleanup?: () => void;
+		}
+	}
+
+	window.__portfolioLenisCleanup?.();
+
+	const finePointer = window.matchMedia('(pointer: fine)');
+	const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+	function destroyLenis() {
+		window.__portfolioLenis?.destroy();
+		delete window.__portfolioLenis;
+	}
+
+	function initLenis() {
+		destroyLenis();
+		if (!finePointer.matches || reducedMotion.matches) return;
+
+		window.__portfolioLenis = new Lenis({
+			autoRaf: true,
+			lerp: 0.14,
+			wheelMultiplier: 0.9,
+			smoothWheel: true,
+			syncTouch: false,
+			anchors: {
+				duration: 0.65,
+				easing: (progress) => 1 - Math.pow(1 - progress, 3),
+			},
+			stopInertiaOnNavigate: true,
+			respectReducedMotion: true,
+		});
+	}
+
+	function stopLenis() {
+		window.__portfolioLenis?.stop();
+	}
+
+	function startLenis() {
+		window.__portfolioLenis?.start();
+	}
+
+	function cleanupLenis() {
+		destroyLenis();
+		finePointer.removeEventListener('change', initLenis);
+		reducedMotion.removeEventListener('change', initLenis);
+		document.removeEventListener('portfolio:scroll-stop', stopLenis);
+		document.removeEventListener('portfolio:scroll-start', startLenis);
+		document.removeEventListener('astro:before-swap', cleanupLenis);
+		delete window.__portfolioLenisCleanup;
+	}
+
+	initLenis();
+	finePointer.addEventListener('change', initLenis);
+	reducedMotion.addEventListener('change', initLenis);
+	document.addEventListener('portfolio:scroll-stop', stopLenis);
+	document.addEventListener('portfolio:scroll-start', startLenis);
+	document.addEventListener('astro:before-swap', cleanupLenis);
+	window.__portfolioLenisCleanup = cleanupLenis;
+</script>

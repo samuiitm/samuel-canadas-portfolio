@@ -1,37 +1,111 @@
-<section class="personal-interlude" id="personal-interlude" aria-label="Referencia personal: The Last of Us" data-personal-interlude>
-	<div class="personal-interlude__inner container-wide">
-		<figure class="personal-interlude__media">
-			<img
-				src="/images/personal/the-last-of-us-part-ii.png"
-				alt="Ellie en primer plano en The Last of Us Part II"
-				width="2048"
-				height="1152"
-				loading="lazy"
-				decoding="async"
-			/>
-		</figure>
-		<div class="personal-interlude__copy">
-			<p>The Last of Us</p>
-			<blockquote>“Pase lo que pase, sigues encontrando algo por lo que luchar.”</blockquote>
+<section class="personal-interlude" id="personal-interlude" aria-label="The Last of Us" data-personal-interlude>
+	<div class="personal-interlude__sticky">
+		<div class="personal-interlude__media" aria-hidden="true">
+			<video
+				data-interlude-video
+				poster="/video/ellie-mochila-poster.jpg"
+				preload="none"
+				muted
+				playsinline
+				disablepictureinpicture
+			>
+				<source src="/video/ellie-mochila-web.mp4" type="video/mp4" />
+			</video>
 		</div>
+
+		<blockquote class="personal-interlude__quote">
+			<span class="personal-interlude__line personal-interlude__line--one">“No importa lo que pase,</span>
+			<span class="personal-interlude__line personal-interlude__line--two">siempre encontrarás algo<br />por lo que luchar.”</span>
+			<cite class="personal-interlude__attribution">— Joel Miller</cite>
+		</blockquote>
 	</div>
 </section>
 
 <script>
-	const interlude = document.querySelector<HTMLElement>('[data-personal-interlude]');
-	if (interlude) {
-		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+	const section = document.querySelector<HTMLElement>('[data-personal-interlude]');
+	const video = section?.querySelector<HTMLVideoElement>('[data-interlude-video]');
+	const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+	if (section && video) {
+		let frame = 0;
+		let duration = 5.2;
+		let targetTime = 0;
+		let isReady = false;
+		let isActive = false;
+
+		const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, value));
+		const smoothstep = (from: number, to: number, value: number) => {
+			const progress = clamp((value - from) / (to - from));
+			return progress * progress * (3 - 2 * progress);
+		};
+
+		const paint = () => {
+			const rect = section.getBoundingClientRect();
+			const viewportHeight = window.innerHeight;
+			const stickyRange = Math.max(1, section.offsetHeight - viewportHeight);
+			const entryProgress = clamp((viewportHeight - rect.top) / viewportHeight);
+			const stickyProgress = clamp(-rect.top / stickyRange);
+			const progress = rect.top > 0
+				? entryProgress * 0.24
+				: 0.24 + stickyProgress * 0.76;
+			targetTime = progress * Math.max(0, duration - 0.04);
+
+			section.style.setProperty('--interlude-progress', progress.toFixed(4));
+			section.style.setProperty('--quote-one', smoothstep(0.68, 0.79, progress).toFixed(4));
+			section.style.setProperty('--quote-two', smoothstep(0.75, 0.88, progress).toFixed(4));
+			section.style.setProperty('--quote-attribution', smoothstep(0.84, 0.94, progress).toFixed(4));
+
+			if (isReady && Math.abs(video.currentTime - targetTime) > 0.012) {
+				video.currentTime = targetTime;
+			}
+		};
+
+		const renderLoop = () => {
+			paint();
+			frame = isActive ? window.requestAnimationFrame(renderLoop) : 0;
+		};
+
+		const requestPaint = () => {
+			if (!frame) frame = window.requestAnimationFrame(renderLoop);
+		};
+
+		const prepareVideo = () => {
+			if (video.preload === 'auto') return;
+			video.preload = 'auto';
+			video.load();
+		};
+
 		if (reduceMotion.matches) {
-			interlude.classList.add('is-visible');
+			section.classList.add('is-reduced-motion');
 		} else {
-			const observer = new IntersectionObserver(([entry]) => {
-				if (entry?.isIntersecting) {
-					interlude.classList.add('is-visible');
-					observer.disconnect();
-				}
-			}, { threshold: 0.24 });
-			observer.observe(interlude);
-			document.addEventListener('astro:before-swap', () => observer.disconnect(), { once: true });
+			const stageObserver = new IntersectionObserver(([entry]) => {
+				isActive = Boolean(entry?.isIntersecting);
+				if (isActive) requestPaint();
+			}, { threshold: 0 });
+
+			const preloadObserver = new IntersectionObserver(([entry]) => {
+				if (!entry?.isIntersecting) return;
+				prepareVideo();
+				preloadObserver.disconnect();
+			}, { rootMargin: '150% 0px' });
+
+			video.addEventListener('loadedmetadata', () => {
+				duration = Number.isFinite(video.duration) ? video.duration : duration;
+				isReady = true;
+				requestPaint();
+			}, { once: true });
+
+			stageObserver.observe(section);
+			preloadObserver.observe(section);
+			requestPaint();
+			window.addEventListener('scroll', requestPaint, { passive: true });
+			window.addEventListener('resize', requestPaint, { passive: true });
+
+			document.addEventListener('astro:before-swap', () => {
+				stageObserver.disconnect();
+				preloadObserver.disconnect();
+				window.cancelAnimationFrame(frame);
+			}, { once: true });
 		}
 	}
 </script>

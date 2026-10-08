@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import InteractionLayer from '../components/InteractionLayer.astro';
 import SmoothScroll from '../components/SmoothScroll.astro';
 
 interface Props {
@@ -37,6 +38,7 @@ const { title, description, lang = 'es' } = Astro.props;
 	</head>
 	<body>
 		<SmoothScroll />
+		<InteractionLayer />
 		<slot />
 	</body>
 </html>

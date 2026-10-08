@@ -100,6 +100,122 @@ video {
 	color: var(--background);
 }
 
+.custom-cursor,
+.custom-scrollbar {
+	display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.custom-cursor {
+		position: fixed;
+		z-index: 1000;
+		top: -0.3125rem;
+		left: -0.3125rem;
+		display: block;
+		width: 0.625rem;
+		aspect-ratio: 1;
+		border: 1px solid color-mix(in srgb, var(--accent) 78%, var(--foreground));
+		border-radius: 50%;
+		background: color-mix(in srgb, var(--accent) 62%, transparent);
+		box-shadow: 0 0 0 1px color-mix(in srgb, var(--background) 42%, transparent);
+		opacity: 0;
+		pointer-events: none;
+		transition: width 180ms var(--ease-standard), background-color 180ms var(--ease-standard), border-color 180ms var(--ease-standard), opacity 120ms ease, margin 180ms var(--ease-standard);
+		will-change: transform;
+	}
+
+	.custom-cursor.is-visible { opacity: 0.9; }
+	.custom-cursor.is-interactive {
+		width: 1.35rem;
+		margin: -0.3625rem;
+		background: color-mix(in srgb, var(--accent) 18%, transparent);
+		border-color: var(--accent);
+	}
+	.custom-cursor.is-pressed { width: 0.95rem; margin: -0.1625rem; }
+	.custom-cursor.is-scrollbar { width: 1.15rem; margin: -0.2625rem; background: transparent; }
+	.custom-cursor.is-grabbing { width: 0.8rem; margin: -0.0875rem; background: var(--accent); }
+
+	html.has-custom-cursor,
+	html.has-custom-cursor body,
+	html.has-custom-cursor a,
+	html.has-custom-cursor button,
+	html.has-custom-cursor input,
+	html.has-custom-cursor select,
+	html.has-custom-cursor textarea,
+	html.has-custom-cursor [role="button"] { cursor: none !important; }
+
+	html.has-custom-scrollbar {
+		scrollbar-width: none;
+		scrollbar-gutter: auto;
+	}
+	html.has-custom-scrollbar::-webkit-scrollbar,
+	html.has-custom-scrollbar body::-webkit-scrollbar { width: 0; height: 0; }
+
+	.custom-scrollbar {
+		position: fixed;
+		z-index: 30;
+		top: 50%;
+		right: clamp(0.35rem, 0.9vw, 0.9rem);
+		display: block;
+		width: 1.25rem;
+		height: min(46vh, 24rem);
+		transform: translateY(-50%);
+		pointer-events: auto;
+	}
+
+	.custom-scrollbar__track {
+		position: relative;
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.custom-scrollbar__track::before {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 50%;
+		width: 1px;
+		background: color-mix(in srgb, var(--foreground) 16%, transparent);
+		content: "";
+		transform: translateX(-50%);
+		transition: background-color 180ms var(--ease-standard);
+	}
+
+	.custom-scrollbar__thumb {
+		position: absolute;
+		top: 0;
+		left: 50%;
+		width: 100%;
+		min-height: 2.25rem;
+		padding: 0;
+		border: 0;
+		background: transparent;
+		outline: none;
+		touch-action: none;
+		will-change: transform;
+	}
+
+	.custom-scrollbar__thumb::before {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 50%;
+		width: 2px;
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--accent) 82%, var(--foreground));
+		content: "";
+		transform: translateX(-50%);
+		transition: width 180ms var(--ease-standard), background-color 180ms var(--ease-standard);
+	}
+
+	.custom-scrollbar:hover .custom-scrollbar__track::before { background: color-mix(in srgb, var(--foreground) 28%, transparent); }
+	.custom-scrollbar:hover .custom-scrollbar__thumb::before,
+	.custom-scrollbar.is-dragging .custom-scrollbar__thumb::before { width: 6px; }
+	.custom-scrollbar.is-dragging .custom-scrollbar__thumb::before { background: var(--accent); }
+	.custom-scrollbar__thumb:focus-visible::before { width: 6px; box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--accent); }
+}
+
 :focus-visible {
 	outline: 0.1875rem solid var(--accent);
 	outline-offset: 0.25rem;

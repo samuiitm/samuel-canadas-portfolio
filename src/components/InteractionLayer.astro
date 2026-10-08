@@ -1,0 +1,226 @@
+<div class="custom-cursor" aria-hidden="true" data-custom-cursor></div>
+<div class="custom-scrollbar" data-custom-scrollbar>
+	<div class="custom-scrollbar__track" data-scrollbar-track>
+		<button class="custom-scrollbar__thumb" type="button" role="scrollbar" aria-label="Desplazamiento de la página" aria-orientation="vertical" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-scrollbar-thumb></button>
+	</div>
+</div>
+
+<script>
+	declare global {
+		interface Window { __portfolioInteractionCleanup?: () => void; }
+	}
+
+	window.__portfolioInteractionCleanup?.();
+	const cursor = document.querySelector<HTMLElement>('[data-custom-cursor]');
+	const scrollbar = document.querySelector<HTMLElement>('[data-custom-scrollbar]');
+	const scrollbarTrack = document.querySelector<HTMLElement>('[data-scrollbar-track]');
+	const scrollbarThumb = document.querySelector<HTMLButtonElement>('[data-scrollbar-thumb]');
+	const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+	const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+	const interactiveSelector = 'a, button, input, select, textarea, [role="button"], .project, [data-scrollbar-track]';
+	let frame = 0;
+	let cursorEnabled = false;
+	let scrollbarEnabled = false;
+	let cursorVisible = false;
+	let cursorSettled = true;
+	let progressDirty = true;
+	let metricsDirty = true;
+	let dragging = false;
+	let dragPointerId = -1;
+	let dragOffset = 0;
+	let currentX = 0;
+	let currentY = 0;
+	let targetX = 0;
+	let targetY = 0;
+	let scrollRange = 1;
+	let trackTop = 0;
+	let trackHeight = 1;
+	let thumbHeight = 36;
+	let thumbTravel = 1;
+	const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+
+	const measureScrollbar = () => {
+		if (!scrollbarTrack || !scrollbarThumb) return;
+		const rect = scrollbarTrack.getBoundingClientRect();
+		const documentHeight = document.documentElement.scrollHeight;
+		trackTop = rect.top;
+		trackHeight = Math.max(1, rect.height);
+		scrollRange = Math.max(1, documentHeight - window.innerHeight);
+		thumbHeight = Math.min(trackHeight, Math.max(36, trackHeight * (window.innerHeight / documentHeight)));
+		thumbTravel = Math.max(1, trackHeight - thumbHeight);
+		scrollbarThumb.style.height = `${thumbHeight.toFixed(2)}px`;
+		metricsDirty = false;
+	};
+
+	const updateScrollbar = () => {
+		if (!scrollbarThumb) return;
+		if (metricsDirty) measureScrollbar();
+		const progress = clamp(window.scrollY / scrollRange, 0, 1);
+		scrollbarThumb.style.transform = `translate3d(-50%, ${(progress * thumbTravel).toFixed(2)}px, 0)`;
+		scrollbarThumb.setAttribute('aria-valuenow', String(Math.round(progress * 100)));
+		progressDirty = false;
+	};
+
+	const requestPaint = () => { if (!frame) frame = window.requestAnimationFrame(paint); };
+	const paint = () => {
+		frame = 0;
+		if (progressDirty || metricsDirty) updateScrollbar();
+		if (!cursorEnabled || !cursor || !cursorVisible) return;
+		currentX += (targetX - currentX) * 0.22;
+		currentY += (targetY - currentY) * 0.22;
+		cursor.style.transform = `translate3d(${currentX.toFixed(2)}px, ${currentY.toFixed(2)}px, 0)`;
+		cursorSettled = Math.abs(targetX - currentX) < 0.05 && Math.abs(targetY - currentY) < 0.05;
+		if (!cursorSettled) requestPaint();
+	};
+
+	const scrollToPosition = (top: number, immediate = false) => {
+		const destination = clamp(top, 0, scrollRange);
+		if (window.__portfolioLenis) {
+			window.__portfolioLenis.scrollTo(destination, immediate || reducedMotion.matches
+				? { immediate: true, force: true }
+				: { duration: 0.55, easing: (progress: number) => 1 - Math.pow(1 - progress, 3), force: true });
+		} else {
+			window.scrollTo({ top: destination, behavior: immediate || reducedMotion.matches ? 'auto' : 'smooth' });
+		}
+	};
+
+	const scrollFromThumbPosition = (thumbTop: number, immediate: boolean) => {
+		scrollToPosition(clamp(thumbTop / thumbTravel, 0, 1) * scrollRange, immediate);
+	};
+
+	const handleThumbPointerDown = (event: PointerEvent) => {
+		if (!scrollbarEnabled || !scrollbarThumb || event.button !== 0) return;
+		event.preventDefault();
+		if (metricsDirty) measureScrollbar();
+		dragging = true;
+		dragPointerId = event.pointerId;
+		dragOffset = event.clientY - scrollbarThumb.getBoundingClientRect().top;
+		scrollbarThumb.setPointerCapture(event.pointerId);
+		scrollbar?.classList.add('is-dragging');
+		cursor?.classList.add('is-grabbing');
+	};
+
+	const handleTrackPointerDown = (event: PointerEvent) => {
+		if (!scrollbarEnabled || event.button !== 0 || event.target === scrollbarThumb) return;
+		event.preventDefault();
+		if (metricsDirty) measureScrollbar();
+		scrollFromThumbPosition(event.clientY - trackTop - thumbHeight / 2, false);
+	};
+
+	const handleDragMove = (event: PointerEvent) => {
+		if (dragging && event.pointerId === dragPointerId) scrollFromThumbPosition(event.clientY - trackTop - dragOffset, true);
+	};
+
+	const endDrag = (event?: PointerEvent) => {
+		if (!dragging || (event && event.pointerId !== dragPointerId)) return;
+		if (event && scrollbarThumb?.hasPointerCapture(event.pointerId)) scrollbarThumb.releasePointerCapture(event.pointerId);
+		dragging = false;
+		dragPointerId = -1;
+		scrollbar?.classList.remove('is-dragging');
+		cursor?.classList.remove('is-grabbing');
+	};
+
+	const handleThumbKeyDown = (event: KeyboardEvent) => {
+		if (!scrollbarEnabled) return;
+		const pageStep = window.innerHeight * 0.9;
+		let destination: number | null = null;
+		if (event.key === 'ArrowDown') destination = window.scrollY + 64;
+		if (event.key === 'ArrowUp') destination = window.scrollY - 64;
+		if (event.key === 'PageDown' || event.key === ' ') destination = window.scrollY + pageStep;
+		if (event.key === 'PageUp') destination = window.scrollY - pageStep;
+		if (event.key === 'Home') destination = 0;
+		if (event.key === 'End') destination = scrollRange;
+		if (destination === null) return;
+		event.preventDefault();
+		scrollToPosition(destination, false);
+	};
+
+	const handlePointerMove = (event: PointerEvent) => {
+		handleDragMove(event);
+		if (!cursorEnabled || !cursor) return;
+		targetX = event.clientX;
+		targetY = event.clientY;
+		if (!cursorVisible) {
+			cursorVisible = true;
+			currentX = targetX;
+			currentY = targetY;
+			document.documentElement.classList.add('has-custom-cursor');
+			cursor.classList.add('is-visible');
+		}
+		cursorSettled = false;
+		requestPaint();
+	};
+
+	const handlePointerOver = (event: PointerEvent) => {
+		if (!cursorEnabled || !cursor) return;
+		const target = event.target instanceof Element ? event.target : null;
+		cursor.classList.toggle('is-interactive', Boolean(target?.closest(interactiveSelector)));
+		cursor.classList.toggle('is-scrollbar', Boolean(target?.closest('[data-custom-scrollbar]')));
+	};
+
+	const handlePointerLeave = () => cursor?.classList.remove('is-visible');
+	const handlePointerEnter = () => { if (cursorVisible) cursor?.classList.add('is-visible'); };
+	const handlePointerDown = () => cursor?.classList.add('is-pressed');
+	const handlePointerUp = (event: PointerEvent) => { cursor?.classList.remove('is-pressed'); endDrag(event); };
+	const handleScroll = () => { progressDirty = true; requestPaint(); };
+	const handleResize = () => { metricsDirty = true; progressDirty = true; requestPaint(); };
+	const contentResizeObserver = new ResizeObserver(handleResize);
+
+	const syncModes = () => {
+		cursorEnabled = finePointer.matches && !reducedMotion.matches;
+		scrollbarEnabled = finePointer.matches && Boolean(scrollbar && scrollbarTrack && scrollbarThumb);
+		document.documentElement.classList.toggle('has-custom-scrollbar', scrollbarEnabled);
+		if (scrollbarEnabled) { metricsDirty = true; progressDirty = true; requestPaint(); }
+		if (cursorEnabled) return;
+		cursorVisible = false;
+		document.documentElement.classList.remove('has-custom-cursor');
+		cursor?.classList.remove('is-visible', 'is-interactive', 'is-scrollbar', 'is-grabbing', 'is-pressed');
+	};
+
+	const cleanup = () => {
+		window.cancelAnimationFrame(frame);
+		endDrag();
+		document.documentElement.classList.remove('has-custom-cursor', 'has-custom-scrollbar');
+		window.removeEventListener('pointermove', handlePointerMove);
+		window.removeEventListener('pointerover', handlePointerOver);
+		document.documentElement.removeEventListener('pointerleave', handlePointerLeave);
+		document.documentElement.removeEventListener('pointerenter', handlePointerEnter);
+		window.removeEventListener('pointerdown', handlePointerDown);
+		window.removeEventListener('pointerup', handlePointerUp);
+		window.removeEventListener('pointercancel', endDrag);
+		window.removeEventListener('scroll', handleScroll);
+		window.removeEventListener('resize', handleResize);
+		window.removeEventListener('load', handleResize);
+		contentResizeObserver.disconnect();
+		scrollbarTrack?.removeEventListener('pointerdown', handleTrackPointerDown);
+		scrollbarThumb?.removeEventListener('pointerdown', handleThumbPointerDown);
+		scrollbarThumb?.removeEventListener('keydown', handleThumbKeyDown);
+		finePointer.removeEventListener('change', syncModes);
+		reducedMotion.removeEventListener('change', syncModes);
+		document.removeEventListener('astro:before-swap', cleanup);
+		delete window.__portfolioInteractionCleanup;
+	};
+
+	syncModes();
+	updateScrollbar();
+	window.addEventListener('pointermove', handlePointerMove, { passive: false });
+	window.addEventListener('pointerover', handlePointerOver, { passive: true });
+	document.documentElement.addEventListener('pointerleave', handlePointerLeave);
+	document.documentElement.addEventListener('pointerenter', handlePointerEnter);
+	window.addEventListener('pointerdown', handlePointerDown, { passive: true });
+	window.addEventListener('pointerup', handlePointerUp, { passive: true });
+	window.addEventListener('pointercancel', endDrag, { passive: true });
+	window.addEventListener('scroll', handleScroll, { passive: true });
+	window.addEventListener('resize', handleResize, { passive: true });
+	window.addEventListener('load', handleResize, { once: true });
+	const main = document.querySelector('main');
+	if (main) contentResizeObserver.observe(main);
+	document.fonts.ready.then(handleResize);
+	scrollbarTrack?.addEventListener('pointerdown', handleTrackPointerDown);
+	scrollbarThumb?.addEventListener('pointerdown', handleThumbPointerDown);
+	scrollbarThumb?.addEventListener('keydown', handleThumbKeyDown);
+	finePointer.addEventListener('change', syncModes);
+	reducedMotion.addEventListener('change', syncModes);
+	document.addEventListener('astro:before-swap', cleanup, { once: true });
+	window.__portfolioInteractionCleanup = cleanup;
+</script>

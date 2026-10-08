@@ -1,28 +1,58 @@
 ---
-const moments = [
-	{ label: 'Base', title: 'Informática', text: 'El primer lenguaje para entender cómo funcionan las cosas.' },
-	{ label: 'Apertura', title: 'Portugal', text: 'Diseño, comunicación y una forma más visual de contar.' },
-	{ label: 'Construcción', title: 'DAW', text: 'Convertir ideas y sistemas en productos que se pueden usar.' },
-	{ label: 'Contexto real', title: 'Malta', text: 'Trabajar en inglés, adaptarse y tomar decisiones con autonomía.' },
-	{ label: 'Cruce', title: 'Nova Unió + NFL', text: 'Dos proyectos reales; dos formas de trabajar que ya no van separadas.' },
-];
+const stages = [
+	{ title: 'Informática', meta: 'Base técnica', copy: 'Empecé desde los sistemas: entender equipos, resolver problemas y trabajar con una base técnica.', pulse: 'technical' },
+	{ title: 'Portugal', meta: 'Erasmus+ · Pax Jovem', copy: 'Junto a otro compañero Erasmus, el diseño y la comunicación empezaron a ganar espacio.', pulse: 'creative' },
+	{ title: 'Desarrollo web', meta: 'Formación superior', copy: 'Pasé de mantener tecnología a programar interfaces y construir aplicaciones.', pulse: 'technical' },
+	{ title: 'Malta', meta: 'Erasmus+ · Decorama', copy: 'Web, diseño, inglés y autonomía se encontraron dentro de una empresa real.', pulse: 'both' },
+	{ title: 'Nova Unió', meta: 'Producto real', copy: 'Un proyecto de DAW empezó a crecer hasta convertirse en una plataforma fuera del aula.', pulse: 'technical' },
+	{ title: 'Nova Fight Legacy', meta: 'Identidad y comunicación', copy: 'La identidad, el contenido, el vídeo y la comunicación dejaron de ser secundarios.', pulse: 'creative' },
+	{ title: 'Ahora', meta: 'Dos partes, un perfil', copy: 'Quiero seguir trabajando justo en el cruce entre lo técnico y lo creativo.', pulse: 'both' },
+] as const;
 ---
 
-<section class="journey section-shell" id="about" aria-labelledby="journey-title">
-	<header class="section-heading">
-		<p class="eyebrow">03 — Recorrido</p>
-		<h2 id="journey-title">No fue una línea recta.<br />Fue encontrando el punto medio.</h2>
-	</header>
-	<ol class="journey__list">
-		{moments.map((moment, index) => (
-			<li>
-				<span class="journey__number">0{index + 1}</span>
-				<div>
-					<p class="journey__label">{moment.label}</p>
-					<h3>{moment.title}</h3>
-				</div>
-				<p>{moment.text}</p>
-			</li>
-		))}
-	</ol>
+<section class="journey depth-level-a" id="about" aria-labelledby="journey-title" data-journey>
+	<div class="journey__inner container-normal">
+		<header class="journey__heading">
+			<p class="eyebrow">03 — Recorrido</p>
+			<h2 id="journey-title">No fue una línea recta.<br />Fui encontrando el punto medio.</h2>
+			<p>Una evolución breve entre sistemas, diseño, desarrollo y comunicación.</p>
+		</header>
+		<ol class="journey__list">
+			{stages.map((stage, index) => (
+				<li class="journey__entry" data-journey-stage data-pulse={stage.pulse}>
+					<div class="journey__index" aria-hidden="true"><span>{String(index + 1).padStart(2, '0')}</span><i></i></div>
+					<div class="journey__stage"><p class="journey__meta">{stage.meta}</p><h3>{stage.title}</h3></div>
+					<p class="journey__copy">{stage.copy}</p>
+				</li>
+			))}
+		</ol>
+	</div>
 </section>
+
+<script>
+	const journey = document.querySelector<HTMLElement>('[data-journey]');
+	const stages = Array.from(document.querySelectorAll<HTMLElement>('[data-journey-stage]'));
+	const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+	if (journey && stages.length && !reduceMotion.matches) {
+		journey.classList.add('has-motion');
+		const setActiveStage = () => {
+			const focusY = window.innerHeight * 0.48;
+			let activeIndex = 0;
+			let closestDistance = Number.POSITIVE_INFINITY;
+			stages.forEach((stage, index) => {
+				const rect = stage.getBoundingClientRect();
+				const distance = Math.abs(rect.top + rect.height / 2 - focusY);
+				if (distance < closestDistance) { closestDistance = distance; activeIndex = index; }
+			});
+			stages.forEach((stage, index) => {
+				stage.classList.toggle('is-active', index === activeIndex);
+				stage.classList.toggle('is-past', index < activeIndex);
+			});
+		};
+		const observer = new IntersectionObserver(setActiveStage, { rootMargin: '-18% 0px -18% 0px', threshold: [0, 0.35, 0.7] });
+		stages.forEach((stage) => observer.observe(stage));
+		setActiveStage();
+		document.addEventListener('astro:before-swap', () => observer.disconnect(), { once: true });
+	}
+</script>

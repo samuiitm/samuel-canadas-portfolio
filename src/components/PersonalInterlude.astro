@@ -1,29 +1,51 @@
-<section class="personal-interlude" id="personal-interlude" aria-label="The Last of Us" data-personal-interlude>
+<section class="personal-interlude" id="personal-interlude" aria-label="The Last of Us y contacto" data-personal-interlude>
+	<span class="personal-interlude__contact-anchor" id="contact" aria-hidden="true"></span>
 	<div class="personal-interlude__sticky">
 		<div class="personal-interlude__media" aria-hidden="true">
-			<video
-				data-interlude-video
-				poster="/video/ellie-mochila-poster.jpg"
-				preload="none"
-				muted
-				playsinline
-				disablepictureinpicture
-			>
-				<source src="/video/ellie-mochila-web.mp4" type="video/mp4" />
+			<video data-interlude-video poster="/video/ellie-mochila-poster.jpg" preload="none" muted playsinline disablepictureinpicture>
+				<source src="/video/ellie-contact-web.mp4" type="video/mp4" />
 			</video>
 		</div>
-
-		<blockquote class="personal-interlude__quote">
+		<div class="personal-interlude__contact-shade" data-contact-shade aria-hidden="true"></div>
+		<blockquote class="personal-interlude__quote" data-interlude-quote>
 			<span class="personal-interlude__line personal-interlude__line--one">“No importa lo que pase,</span>
 			<span class="personal-interlude__line personal-interlude__line--two">siempre encontrarás algo<br />por lo que luchar.”</span>
 			<cite class="personal-interlude__attribution">— Joel Miller</cite>
 		</blockquote>
+		<div class="interlude-contact" aria-labelledby="contact-title" data-interlude-contact inert>
+			<div class="interlude-contact__intro">
+				<p class="eyebrow interlude-contact__eyebrow" data-contact-eyebrow>05 — Contacto</p>
+				<h2 id="contact-title" data-contact-title>¿Hablamos?</h2>
+				<p class="interlude-contact__subtitle" data-contact-subtitle>Si tienes una idea, una oportunidad o simplemente quieres conocer mejor mi trabajo, escríbeme.</p>
+				<a class="interlude-contact__cv" href="/Samuel-Canadas-CV.pdf" download="Samuel-Canadas-CV.pdf" aria-label="Descargar el CV de Samuel Cañadas en PDF" data-contact-cv>
+					<span>Descargar CV</span><i aria-hidden="true">↓</i>
+				</a>
+			</div>
+			<nav class="interlude-contact__links" aria-label="Vías de contacto">
+				<a class="interlude-contact__link" data-contact-link href="mailto:samuelcsruiz@gmail.com" aria-label="Enviar un email a samuelcsruiz@gmail.com"><span>Email</span><small>samuelcsruiz@gmail.com</small></a>
+				<a class="interlude-contact__link" data-contact-link href="https://www.linkedin.com/in/scanadas/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn de Samuel Cañadas, se abre en una pestaña nueva"><span>LinkedIn</span><i aria-hidden="true">↗</i></a>
+				<a class="interlude-contact__link" data-contact-link href="https://github.com/samuiitm" target="_blank" rel="noopener noreferrer" aria-label="GitHub de Samuel Cañadas, se abre en una pestaña nueva"><span>GitHub</span><i aria-hidden="true">↗</i></a>
+			</nav>
+			<footer class="interlude-contact__footer" data-contact-footer>
+				<span>Samuel Cañadas · 2026/27</span>
+				<a href="#top" aria-label="Volver al inicio de la página">↑ Volver arriba</a>
+			</footer>
+		</div>
 	</div>
 </section>
 
 <script>
 	const section = document.querySelector<HTMLElement>('[data-personal-interlude]');
 	const video = section?.querySelector<HTMLVideoElement>('[data-interlude-video]');
+	const contact = section?.querySelector<HTMLElement>('[data-interlude-contact]');
+	const quote = section?.querySelector<HTMLElement>('[data-interlude-quote]');
+	const shade = section?.querySelector<HTMLElement>('[data-contact-shade]');
+	const contactEyebrow = section?.querySelector<HTMLElement>('[data-contact-eyebrow]');
+	const contactTitle = section?.querySelector<HTMLElement>('[data-contact-title]');
+	const contactSubtitle = section?.querySelector<HTMLElement>('[data-contact-subtitle]');
+	const contactCv = section?.querySelector<HTMLElement>('[data-contact-cv]');
+	const contactLinks = section?.querySelectorAll<HTMLElement>('[data-contact-link]');
+	const contactFooter = section?.querySelector<HTMLElement>('[data-contact-footer]');
 	const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 	if (section && video) {
@@ -32,43 +54,72 @@
 		let targetTime = 0;
 		let isReady = false;
 		let isActive = false;
+		let contactIsActive = false;
+		let viewportHeight = window.innerHeight;
+		let stickyRange = Math.max(1, section.offsetHeight - viewportHeight);
 
 		const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, value));
 		const smoothstep = (from: number, to: number, value: number) => {
 			const progress = clamp((value - from) / (to - from));
 			return progress * progress * (3 - 2 * progress);
 		};
+		const fadeWindow = (start: number, end: number, outStart: number, outEnd: number, value: number) =>
+			smoothstep(start, end, value) * (1 - smoothstep(outStart, outEnd, value));
+		const mapVideoTime = (progress: number) => {
+			const movementEndProgress = 0.52;
+			const movementEndTime = Math.min(3.85, duration - 0.04);
+			const holdStartProgress = 0.74;
+			const holdTime = Math.min(5, duration - 0.04);
+			if (progress <= movementEndProgress) return (progress / movementEndProgress) * movementEndTime;
+			if (progress <= holdStartProgress) {
+				const quoteProgress = (progress - movementEndProgress) / (holdStartProgress - movementEndProgress);
+				return movementEndTime + quoteProgress * (holdTime - movementEndTime);
+			}
+			return holdTime;
+		};
+
+		const setReveal = (element: HTMLElement | null | undefined, value: number) => {
+			if (element) element.style.setProperty('--reveal', value.toFixed(4));
+		};
+		const measure = () => {
+			viewportHeight = window.innerHeight;
+			stickyRange = Math.max(1, section.offsetHeight - viewportHeight);
+		};
 
 		const paint = () => {
 			const rect = section.getBoundingClientRect();
-			const viewportHeight = window.innerHeight;
-			const stickyRange = Math.max(1, section.offsetHeight - viewportHeight);
 			const entryProgress = clamp((viewportHeight - rect.top) / viewportHeight);
 			const stickyProgress = clamp(-rect.top / stickyRange);
-			const progress = rect.top > 0
-				? entryProgress * 0.24
-				: 0.24 + stickyProgress * 0.76;
-			targetTime = progress * Math.max(0, duration - 0.04);
+			const progress = rect.top > 0 ? entryProgress * 0.2 : 0.2 + stickyProgress * 0.8;
+			targetTime = mapVideoTime(progress);
 
-			section.style.setProperty('--interlude-progress', progress.toFixed(4));
-			section.style.setProperty('--quote-one', smoothstep(0.68, 0.79, progress).toFixed(4));
-			section.style.setProperty('--quote-two', smoothstep(0.75, 0.88, progress).toFixed(4));
-			section.style.setProperty('--quote-attribution', smoothstep(0.84, 0.94, progress).toFixed(4));
-
-			if (isReady && Math.abs(video.currentTime - targetTime) > 0.012) {
-				video.currentTime = targetTime;
+			if (quote) {
+				quote.style.setProperty('--quote-one', fadeWindow(0.5, 0.57, 0.77, 0.82, progress).toFixed(4));
+				quote.style.setProperty('--quote-two', fadeWindow(0.56, 0.64, 0.76, 0.81, progress).toFixed(4));
+				quote.style.setProperty('--quote-attribution', fadeWindow(0.62, 0.69, 0.73, 0.78, progress).toFixed(4));
 			}
+			section.style.setProperty('--contact-settle', smoothstep(0.82, 1, progress).toFixed(4));
+			setReveal(shade, smoothstep(0.82, 0.9, progress));
+			setReveal(contactEyebrow, smoothstep(0.83, 0.88, progress));
+			setReveal(contactTitle, smoothstep(0.84, 0.9, progress));
+			setReveal(contactSubtitle, smoothstep(0.87, 0.92, progress));
+			setReveal(contactCv, smoothstep(0.89, 0.94, progress));
+			setReveal(contactLinks?.[0], smoothstep(0.91, 0.95, progress));
+			setReveal(contactLinks?.[1], smoothstep(0.93, 0.97, progress));
+			setReveal(contactLinks?.[2], smoothstep(0.95, 0.985, progress));
+			setReveal(contactFooter, smoothstep(0.97, 1, progress));
+			const nextContactIsActive = progress >= 0.89;
+			if (contact && nextContactIsActive !== contactIsActive) {
+				contactIsActive = nextContactIsActive;
+				section.classList.toggle('is-contact-active', contactIsActive);
+				contact.inert = !contactIsActive;
+				contact.setAttribute('aria-hidden', String(!contactIsActive));
+			}
+			if (isReady && Math.abs(video.currentTime - targetTime) > 0.012) video.currentTime = targetTime;
 		};
-
-		const renderLoop = () => {
-			paint();
-			frame = isActive ? window.requestAnimationFrame(renderLoop) : 0;
-		};
-
-		const requestPaint = () => {
-			if (!frame) frame = window.requestAnimationFrame(renderLoop);
-		};
-
+		const renderFrame = () => { frame = 0; if (isActive) paint(); };
+		const requestPaint = () => { if (!frame) frame = window.requestAnimationFrame(renderFrame); };
+		const handleResize = () => { measure(); requestPaint(); };
 		const prepareVideo = () => {
 			if (video.preload === 'auto') return;
 			video.preload = 'auto';
@@ -77,33 +128,36 @@
 
 		if (reduceMotion.matches) {
 			section.classList.add('is-reduced-motion');
+			if (contact) {
+				contact.inert = false;
+				contact.setAttribute('aria-hidden', 'false');
+			}
 		} else {
 			const stageObserver = new IntersectionObserver(([entry]) => {
 				isActive = Boolean(entry?.isIntersecting);
 				if (isActive) requestPaint();
 			}, { threshold: 0 });
-
 			const preloadObserver = new IntersectionObserver(([entry]) => {
 				if (!entry?.isIntersecting) return;
 				prepareVideo();
 				preloadObserver.disconnect();
 			}, { rootMargin: '150% 0px' });
-
 			video.addEventListener('loadedmetadata', () => {
 				duration = Number.isFinite(video.duration) ? video.duration : duration;
 				isReady = true;
 				requestPaint();
 			}, { once: true });
-
 			stageObserver.observe(section);
 			preloadObserver.observe(section);
+			measure();
 			requestPaint();
 			window.addEventListener('scroll', requestPaint, { passive: true });
-			window.addEventListener('resize', requestPaint, { passive: true });
-
+			window.addEventListener('resize', handleResize, { passive: true });
 			document.addEventListener('astro:before-swap', () => {
 				stageObserver.disconnect();
 				preloadObserver.disconnect();
+				window.removeEventListener('scroll', requestPaint);
+				window.removeEventListener('resize', handleResize);
 				window.cancelAnimationFrame(frame);
 			}, { once: true });
 		}

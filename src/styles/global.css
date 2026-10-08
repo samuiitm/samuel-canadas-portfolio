@@ -996,6 +996,17 @@ main {
 .now-playing__spotify:hover, .now-playing__spotify:focus-visible { border-color: var(--foreground); background: var(--foreground); color: var(--background); outline: none; }
 .now-playing__play { display: grid; width: 1.7rem; aspect-ratio: 1; place-items: center; border-radius: 50%; background: var(--accent); color: var(--background); font-size: 0.55rem; }
 
+.personal-interlude { position: relative; display: grid; min-height: clamp(42rem, 88svh, 62rem); place-items: center; padding-block: clamp(5rem, 10vw, 9rem); overflow: clip; background: linear-gradient(180deg, var(--background), color-mix(in srgb, var(--depth-a) 78%, var(--background))); }
+.personal-interlude__inner { position: relative; }
+.personal-interlude__media { position: relative; width: min(88%, 72rem); margin: 0 0 0 auto; aspect-ratio: 16 / 9; overflow: hidden; background: var(--surface-secondary); clip-path: inset(0 0 0 8%); opacity: 0; transform: scale(1.025); transform-origin: 70% 50%; transition: clip-path 900ms var(--ease-standard), opacity 650ms var(--ease-standard), transform 1100ms var(--ease-standard); }
+.personal-interlude__media::after { position: absolute; inset: 0; background: linear-gradient(90deg, color-mix(in srgb, var(--background) 82%, transparent), transparent 34%), linear-gradient(0deg, color-mix(in srgb, #10151a 26%, transparent), transparent 45%); content: ""; pointer-events: none; }
+.personal-interlude__media img { width: 100%; height: 100%; object-fit: cover; object-position: 58% center; filter: saturate(0.82) contrast(1.03); }
+.personal-interlude__copy { position: absolute; z-index: 2; bottom: clamp(2.5rem, 7vw, 6.5rem); left: 0; width: min(47rem, 64%); opacity: 0; transform: translateY(1.25rem); transition: opacity 650ms 180ms var(--ease-standard), transform 750ms 180ms var(--ease-standard); }
+.personal-interlude__copy p { margin: 0 0 1.25rem; color: color-mix(in srgb, #f4efe7 72%, transparent); font-size: 0.64rem; letter-spacing: 0.13em; text-transform: uppercase; }
+.personal-interlude__copy blockquote { margin: 0; color: #f4efe7; font-size: clamp(2.25rem, 4.7vw, 5rem); font-weight: 500; letter-spacing: -0.06em; line-height: 0.98; text-wrap: balance; text-shadow: 0 0.15rem 1.5rem rgb(0 0 0 / 0.25); }
+.personal-interlude.is-visible .personal-interlude__media { clip-path: inset(0); opacity: 1; transform: scale(1); }
+.personal-interlude.is-visible .personal-interlude__copy { opacity: 1; transform: translateY(0); }
+
 .contact {
 	display: flex;
 	flex-direction: column;
@@ -1587,6 +1598,13 @@ main {
 	.now-playing blockquote { display: block; grid-column: 1 / -1; max-height: 0; min-height: 0; margin: 0; overflow: hidden; font-size: 0.94rem; opacity: 0; transition: max-height 380ms var(--ease-standard), margin 300ms var(--ease-standard), opacity 220ms var(--ease-standard); }
 	.personal.is-phrase-open .now-playing blockquote { max-height: 24rem; margin: 1.25rem 0 0.5rem; opacity: 1; }
 	.now-playing__spotify { grid-column: 1 / -1; margin-top: 1rem; }
+	.personal-interlude { min-height: auto; padding-block: 6rem 8rem; }
+	.personal-interlude__media { width: calc(100% + var(--wide-gutter)); margin-left: 0; aspect-ratio: 4 / 5; }
+	.personal-interlude__media::after { background: linear-gradient(0deg, color-mix(in srgb, var(--background) 18%, transparent), transparent 38%); }
+	.personal-interlude__media img { object-position: 61% center; }
+	.personal-interlude__copy { position: static; width: 100%; margin-top: 2.5rem; color: var(--foreground); }
+	.personal-interlude__copy p { margin-bottom: 1rem; color: var(--muted); }
+	.personal-interlude__copy blockquote { color: var(--foreground); font-size: clamp(2.2rem, 11vw, 3.5rem); line-height: 1.02; text-shadow: none; }
 
 	.contact {
 		min-height: 100svh;
@@ -1693,7 +1711,12 @@ main {
 
 	.now-playing__content,
 	.track-row,
-	.track-row__marker {
+	.track-row__marker,
+	.personal-interlude__media,
+	.personal-interlude__copy {
 		transition: none;
 	}
+
+	.personal-interlude__media,
+	.personal-interlude__copy { opacity: 1; transform: none; clip-path: none; }
 }

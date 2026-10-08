@@ -1,0 +1,37 @@
+<section class="personal-interlude" id="personal-interlude" aria-label="Referencia personal: The Last of Us" data-personal-interlude>
+	<div class="personal-interlude__inner container-wide">
+		<figure class="personal-interlude__media">
+			<img
+				src="/images/personal/the-last-of-us-part-ii.png"
+				alt="Ellie en primer plano en The Last of Us Part II"
+				width="2048"
+				height="1152"
+				loading="lazy"
+				decoding="async"
+			/>
+		</figure>
+		<div class="personal-interlude__copy">
+			<p>The Last of Us</p>
+			<blockquote>“Pase lo que pase, sigues encontrando algo por lo que luchar.”</blockquote>
+		</div>
+	</div>
+</section>
+
+<script>
+	const interlude = document.querySelector<HTMLElement>('[data-personal-interlude]');
+	if (interlude) {
+		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+		if (reduceMotion.matches) {
+			interlude.classList.add('is-visible');
+		} else {
+			const observer = new IntersectionObserver(([entry]) => {
+				if (entry?.isIntersecting) {
+					interlude.classList.add('is-visible');
+					observer.disconnect();
+				}
+			}, { threshold: 0.24 });
+			observer.observe(interlude);
+			document.addEventListener('astro:before-swap', () => observer.disconnect(), { once: true });
+		}
+	}
+</script>

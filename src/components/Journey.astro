@@ -1,12 +1,13 @@
 ---
 const stages = [
-	{ title: 'Informática', meta: 'Base técnica', copy: 'Empecé desde los sistemas: entender equipos, resolver problemas y trabajar con una base técnica.', pulse: 'technical' },
-	{ title: 'Portugal', meta: 'Erasmus+ · Pax Jovem', copy: 'Junto a otro compañero Erasmus, el diseño y la comunicación empezaron a ganar espacio.', pulse: 'creative' },
-	{ title: 'Desarrollo web', meta: 'Formación superior', copy: 'Pasé de mantener tecnología a programar interfaces y construir aplicaciones.', pulse: 'technical' },
-	{ title: 'Malta', meta: 'Erasmus+ · Decorama', copy: 'Web, diseño, inglés y autonomía se encontraron dentro de una empresa real.', pulse: 'both' },
-	{ title: 'Nova Unió', meta: 'Producto real', copy: 'Un proyecto de DAW empezó a crecer hasta convertirse en una plataforma fuera del aula.', pulse: 'technical' },
-	{ title: 'Nova Fight Legacy', meta: 'Identidad y comunicación', copy: 'La identidad, el contenido, el vídeo y la comunicación dejaron de ser secundarios.', pulse: 'creative' },
-	{ title: 'Ahora', meta: 'Dos partes, un perfil', copy: 'Quiero seguir trabajando justo en el cruce entre lo técnico y lo creativo.', pulse: 'both' },
+	{ title: 'Informática', meta: 'Base técnica', copy: 'Empecé por informática porque siempre me había gustado entender cómo funcionan las cosas y trastear con ordenadores.', pulse: 'technical' },
+	{ title: 'Portugal', meta: 'Erasmus+ · Pax Jovem', copy: 'Mi primera experiencia fuera. Me sirvió para espabilarme, trabajar con gente nueva y empezar a salir bastante de mi zona de confort.', pulse: 'creative' },
+	{ title: 'Desarrollo web', meta: 'Formación superior', copy: 'Después llegó el desarrollo web. Ahí empecé a convertir ideas en proyectos que ya se podían enseñar y utilizar de verdad.', pulse: 'technical' },
+	{ title: 'Malta', meta: 'Erasmus+ · Decorama', copy: 'Tres meses de Erasmus trabajando en inglés y bastante por mi cuenta. Una experiencia que me obligó a desenvolverme de otra manera.', pulse: 'both' },
+	{ title: 'Nova Unió', meta: 'Producto real', copy: 'Empezó como un proyecto de clase y terminó convirtiéndose en una web y una herramienta real para un club que conozco desde dentro.', pulse: 'technical' },
+	{ title: 'Nova Fight Legacy', meta: 'Identidad y comunicación', copy: 'Aquí fue donde más empecé a tirar hacia la parte creativa: diseño, vídeo, redes y toda la imagen de un evento desde cero.', pulse: 'creative' },
+	{ title: 'Comfortek', meta: 'Entorno técnico', copy: 'Una etapa bastante distinta, trabajando en domótica y en un entorno mucho más técnico y nuevo para mí. También me sirvió para tener más claro hacia dónde quería tirar.', pulse: 'technical' },
+	{ title: 'Ahora', meta: 'Dos partes, un perfil', copy: 'Ahora sé bastante mejor dónde encajo: en proyectos donde puedo mezclar desarrollo web, diseño, contenido y marketing.', pulse: 'both' },
 ] as const;
 ---
 
@@ -14,8 +15,7 @@ const stages = [
 	<div class="journey__inner container-normal">
 		<header class="journey__heading">
 			<p class="eyebrow">03 — Recorrido</p>
-			<h2 id="journey-title">No fue una línea recta.<br />Fui encontrando el punto medio.</h2>
-			<p>Una evolución breve entre sistemas, diseño, desarrollo y comunicación.</p>
+			<h2 id="journey-title">He ido descubriendo dónde encajo mejor.</h2>
 		</header>
 		<ol class="journey__list">
 			{stages.map((stage, index) => (

@@ -9,7 +9,7 @@
 		<div class="personal-interlude__contact-shade" data-contact-shade aria-hidden="true"></div>
 		<blockquote class="personal-interlude__quote" data-interlude-quote>
 			<span class="personal-interlude__line personal-interlude__line--one">“No importa lo que pase,</span>
-			<span class="personal-interlude__line personal-interlude__line--two">siempre encontrarás algo<br />por lo que luchar.”</span>
+			<span class="personal-interlude__line personal-interlude__line--two">siempre encuentras algo<br />por lo que luchar.”</span>
 			<cite class="personal-interlude__attribution">— Joel Miller</cite>
 		</blockquote>
 		<div class="interlude-contact" aria-labelledby="contact-title" data-interlude-contact inert>
@@ -22,7 +22,7 @@
 				</a>
 			</div>
 			<nav class="interlude-contact__links" aria-label="Vías de contacto">
-				<a class="interlude-contact__link" data-contact-link href="mailto:samuelcsruiz@gmail.com" aria-label="Enviar un email a samuelcsruiz@gmail.com"><span>Email</span><small>samuelcsruiz@gmail.com</small></a>
+				<a class="interlude-contact__link" data-contact-link href="mailto:samuelcanadas2711@gmail.com" aria-label="Enviar un email a samuelcanadas2711@gmail.com"><span>Email</span><small>samuelcanadas2711@gmail.com</small></a>
 				<a class="interlude-contact__link" data-contact-link href="https://www.linkedin.com/in/scanadas/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn de Samuel Cañadas, se abre en una pestaña nueva"><span>LinkedIn</span><i aria-hidden="true">↗</i></a>
 				<a class="interlude-contact__link" data-contact-link href="https://github.com/samuiitm" target="_blank" rel="noopener noreferrer" aria-label="GitHub de Samuel Cañadas, se abre en una pestaña nueva"><span>GitHub</span><i aria-hidden="true">↗</i></a>
 			</nav>
@@ -55,8 +55,10 @@
 		let isReady = false;
 		let isActive = false;
 		let contactIsActive = false;
+		let headerHeight = 0;
 		let viewportHeight = window.innerHeight;
-		let stickyRange = Math.max(1, section.offsetHeight - viewportHeight);
+		let availableHeight = viewportHeight;
+		let stickyRange = Math.max(1, section.offsetHeight - availableHeight);
 
 		const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, value));
 		const smoothstep = (from: number, to: number, value: number) => {
@@ -83,14 +85,16 @@
 		};
 		const measure = () => {
 			viewportHeight = window.innerHeight;
-			stickyRange = Math.max(1, section.offsetHeight - viewportHeight);
+			headerHeight = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 0;
+			availableHeight = Math.max(1, viewportHeight - headerHeight);
+			stickyRange = Math.max(1, section.offsetHeight - availableHeight);
 		};
 
 		const paint = () => {
 			const rect = section.getBoundingClientRect();
-			const entryProgress = clamp((viewportHeight - rect.top) / viewportHeight);
-			const stickyProgress = clamp(-rect.top / stickyRange);
-			const progress = rect.top > 0 ? entryProgress * 0.2 : 0.2 + stickyProgress * 0.8;
+			const entryProgress = clamp((viewportHeight - rect.top) / availableHeight);
+			const stickyProgress = clamp((headerHeight - rect.top) / stickyRange);
+			const progress = rect.top > headerHeight ? entryProgress * 0.2 : 0.2 + stickyProgress * 0.8;
 			targetTime = mapVideoTime(progress);
 
 			if (quote) {
@@ -98,8 +102,11 @@
 				quote.style.setProperty('--quote-two', fadeWindow(0.56, 0.64, 0.76, 0.81, progress).toFixed(4));
 				quote.style.setProperty('--quote-attribution', fadeWindow(0.62, 0.69, 0.73, 0.78, progress).toFixed(4));
 			}
+			const contactTransition = smoothstep(0.82, 0.9, progress);
 			section.style.setProperty('--contact-settle', smoothstep(0.82, 1, progress).toFixed(4));
-			setReveal(shade, smoothstep(0.82, 0.9, progress));
+			document.documentElement.style.setProperty('--header-contact-progress', contactTransition.toFixed(4));
+			document.querySelector('[data-site-header]')?.classList.toggle('is-contact-transition', contactTransition > 0);
+			setReveal(shade, contactTransition);
 			setReveal(contactEyebrow, smoothstep(0.83, 0.88, progress));
 			setReveal(contactTitle, smoothstep(0.84, 0.9, progress));
 			setReveal(contactSubtitle, smoothstep(0.87, 0.92, progress));
@@ -128,6 +135,9 @@
 
 		if (reduceMotion.matches) {
 			section.classList.add('is-reduced-motion');
+			section.classList.add('is-contact-active');
+			document.documentElement.style.setProperty('--header-contact-progress', '1');
+			document.querySelector('[data-site-header]')?.classList.add('is-contact-transition');
 			if (contact) {
 				contact.inert = false;
 				contact.setAttribute('aria-hidden', 'false');
@@ -153,12 +163,16 @@
 			requestPaint();
 			window.addEventListener('scroll', requestPaint, { passive: true });
 			window.addEventListener('resize', handleResize, { passive: true });
+			window.addEventListener('portfolio:header-resize', handleResize);
 			document.addEventListener('astro:before-swap', () => {
 				stageObserver.disconnect();
 				preloadObserver.disconnect();
 				window.removeEventListener('scroll', requestPaint);
 				window.removeEventListener('resize', handleResize);
+				window.removeEventListener('portfolio:header-resize', handleResize);
 				window.cancelAnimationFrame(frame);
+				document.documentElement.style.removeProperty('--header-contact-progress');
+				document.querySelector('[data-site-header]')?.classList.remove('is-contact-transition');
 			}, { once: true });
 		}
 	}

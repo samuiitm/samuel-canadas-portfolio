@@ -4,24 +4,29 @@
 		<div class="hero__edition" aria-hidden="true">Portfolio — 2026/27</div>
 		<figure class="hero-photo" data-hero-photo>
 			<div class="hero-photo__media">
-				<img
-					src="/images/hero/samuel-nfl-staff.jpg"
-					alt="Samuel de espaldas como parte del staff de Nova Fight Legacy durante un evento"
-					width="1152"
-					height="1536"
-					loading="eager"
-					decoding="async"
-					fetchpriority="high"
-				/>
+				<picture>
+					<source
+						type="image/webp"
+						srcset="/images/hero/samuel-nfl-staff-640.webp 640w, /images/hero/samuel-nfl-staff-960.webp 960w, /images/hero/samuel-nfl-staff-1152.webp 1152w"
+						sizes="(max-width: 48rem) calc(100vw - 3rem), (max-width: 80rem) 43vw, 35rem"
+					/>
+					<img
+						src="/images/hero/samuel-nfl-staff.jpg"
+						alt="Samuel de espaldas como parte del staff de Nova Fight Legacy durante un evento"
+						width="1152"
+						height="1536"
+						loading="eager"
+						decoding="async"
+						fetchpriority="high"
+					/>
+				</picture>
 			</div>
 			<figcaption class="hero__caption">NFL / Staff · En acción</figcaption>
-			<div class="hero__descriptor" aria-label="Marketing Digital y Creativo más Desarrollo Web">
-				<p>Marketing Digital<br />&amp; Creativo</p><span aria-hidden="true">+</span><p>Desarrollo<br />Web</p>
+			<div class="hero__descriptor" aria-label="Desarrollo Web más Marketing Digital y Creativo">
+				<p>Desarrollo<br />Web</p><span aria-hidden="true">+</span><p>Marketing Digital<br />&amp; Creativo</p>
 			</div>
 		</figure>
 		<h1 class="hero__title" id="hero-title"><span>Samuel</span><span>Cañadas.</span></h1>
-		<p class="hero__aside">Nota al margen — todavía aprendiendo.</p>
-		<a class="hero__scroll" href="#statement"><span>Scroll</span><span aria-hidden="true">↓</span></a>
 	</div>
 </section>
 

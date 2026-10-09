@@ -2,7 +2,7 @@
 import ThemeToggle from './ThemeToggle';
 ---
 
-<header class="site-header">
+<header class="site-header" data-site-header>
 	<div class="site-header__inner container-wide">
 		<a class="site-header__identity" href="#top">Samuel Cañadas</a>
 		<nav class="site-header__nav" aria-label="Navegación principal">
@@ -18,3 +18,39 @@ import ThemeToggle from './ThemeToggle';
 		</div>
 	</div>
 </header>
+
+<script>
+	const siteHeader = document.querySelector<HTMLElement>('[data-site-header]');
+	let headerFrame: number | null = null;
+	let measuredHeaderHeight = -1;
+
+	function updateHeaderHeight() {
+		if (!siteHeader) return;
+		const nextHeight = siteHeader.getBoundingClientRect().height;
+		if (Math.abs(nextHeight - measuredHeaderHeight) < 0.5) return;
+		measuredHeaderHeight = nextHeight;
+		document.documentElement.style.setProperty('--header-height', `${nextHeight.toFixed(2)}px`);
+		window.dispatchEvent(new CustomEvent('portfolio:header-resize', { detail: { height: nextHeight } }));
+	}
+
+	function updateHeaderState() {
+		headerFrame = null;
+		siteHeader?.classList.toggle('is-scrolled', window.scrollY > 12);
+	}
+
+	function requestHeaderState() {
+		if (headerFrame !== null) return;
+		headerFrame = window.requestAnimationFrame(updateHeaderState);
+	}
+
+	const headerResizeObserver = siteHeader ? new ResizeObserver(updateHeaderHeight) : null;
+	headerResizeObserver?.observe(siteHeader);
+	updateHeaderHeight();
+	updateHeaderState();
+	window.addEventListener('scroll', requestHeaderState, { passive: true });
+	document.addEventListener('astro:before-swap', () => {
+		headerResizeObserver?.disconnect();
+		window.removeEventListener('scroll', requestHeaderState);
+		if (headerFrame !== null) window.cancelAnimationFrame(headerFrame);
+	}, { once: true });
+</script>

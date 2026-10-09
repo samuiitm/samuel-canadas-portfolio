@@ -22,7 +22,7 @@ const selectedTrack = tracks[0];
 	<div class="personal__sticky">
 	<header class="personal__intro container-wide">
 		<p class="eyebrow">04 — Fuera del trabajo</p>
-		<h2 id="personal-title">Lo que también forma mi criterio.</h2>
+		<h2 id="personal-title">Muchas ideas empiezan con música.</h2>
 	</header>
 
 	<div class="cientoonce container-wide">
@@ -32,7 +32,7 @@ const selectedTrack = tracks[0];
 				<div class="playlist-app__identity">
 					<p class="playlist-app__label">Playlist personal</p>
 					<h3>cientoonce</h3>
-					<p class="playlist-app__description">Canciones a las que vuelvo. Letras que se quedan.</p>
+					<p class="playlist-app__description">Canciones y letras que por alguna razón siempre termino recordando.</p>
 					<p class="playlist-app__metadata"><strong>Samuel</strong><span aria-hidden="true">·</span><span>14 tracks</span></p>
 				</div>
 			</header>
@@ -40,9 +40,9 @@ const selectedTrack = tracks[0];
 			<div class="playlist-app__content">
 				<div class="tracklist__viewport" data-tracklist-viewport>
 					<div class="tracklist__heading" aria-hidden="true"><span>#</span><span>Título</span><span>Artista</span></div>
-				<div class="tracklist" data-tracklist-rail role="list" aria-label="Canciones de la playlist cientoonce">
+				<div class="tracklist" data-tracklist-rail role="group" aria-label="Canciones de la playlist cientoonce">
 					{tracks.map((track, index) => (
-						<button type="button" class:list={['track-row', { 'is-selected': index === 0 }]} role="listitem" data-track data-number={track.number} data-title={track.title} data-artist={track.artist} data-quote={track.quote} data-cover={track.cover} data-spotify-url={track.spotifyUrl} aria-pressed={index === 0 ? 'true' : 'false'}>
+						<button type="button" class:list={['track-row', { 'is-selected': index === 0 }]} data-track data-number={track.number} data-title={track.title} data-artist={track.artist} data-quote={track.quote} data-cover={track.cover} data-spotify-url={track.spotifyUrl} aria-pressed={index === 0 ? 'true' : 'false'}>
 							<span class="track-row__number">{track.number}</span>
 							<img class="track-row__cover" src={track.cover} alt="" width="48" height="48" loading="lazy" decoding="async" />
 							<span class="track-row__title">{track.title}</span>
@@ -129,8 +129,10 @@ const selectedTrack = tracks[0];
 			const availableHeight = viewport.clientHeight - (heading?.offsetHeight ?? 0);
 			const travel = Math.max(0, rail.scrollHeight - availableHeight);
 			const rect = personal.getBoundingClientRect();
-			const range = Math.max(1, personal.offsetHeight - window.innerHeight);
-			const progress = Math.min(1, Math.max(0, -rect.top / range));
+			const headerHeight = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 0;
+			const usableViewportHeight = Math.max(1, window.innerHeight - headerHeight);
+			const range = Math.max(1, personal.offsetHeight - usableViewportHeight);
+			const progress = Math.min(1, Math.max(0, (headerHeight - rect.top) / range));
 			rail.style.transform = `translate3d(0, ${-travel * progress}px, 0)`;
 		};
 
@@ -139,7 +141,9 @@ const selectedTrack = tracks[0];
 				const heading = viewport.querySelector<HTMLElement>('.tracklist__heading');
 				const availableHeight = viewport.clientHeight - (heading?.offsetHeight ?? 0);
 				const travel = Math.max(0, rail.scrollHeight - availableHeight);
-				personal.style.setProperty('--playlist-scroll-distance', `${Math.max(window.innerHeight * 0.85, travel * 1.8)}px`);
+				const headerHeight = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 0;
+				const usableViewportHeight = Math.max(1, window.innerHeight - headerHeight);
+				personal.style.setProperty('--playlist-scroll-distance', `${Math.max(usableViewportHeight * 0.85, travel * 1.8)}px`);
 			} else {
 				personal.style.removeProperty('--playlist-scroll-distance');
 			}
@@ -151,6 +155,7 @@ const selectedTrack = tracks[0];
 		};
 		window.addEventListener('scroll', requestPlaylistScroll, { passive: true });
 		window.addEventListener('resize', sizePlaylist, { passive: true });
+		window.addEventListener('portfolio:header-resize', sizePlaylist);
 		window.addEventListener('load', sizePlaylist, { once: true });
 		requestAnimationFrame(sizePlaylist);
 	}

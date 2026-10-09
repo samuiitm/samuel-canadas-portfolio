@@ -1,0 +1,112 @@
+---
+import type { PortfolioProject } from '../data/projects';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from './Header.astro';
+
+interface Props {
+	project: PortfolioProject;
+}
+
+const { project } = Astro.props;
+const canonicalPath = `/proyectos/${project.slug}/`;
+const canonicalUrl = `https://samuelcanadas.com${canonicalPath}`;
+const breadcrumbId = `${canonicalUrl}#breadcrumb`;
+const workId = `${canonicalUrl}#project`;
+
+const structuredData = {
+	'@context': 'https://schema.org',
+	'@graph': [
+		{
+			'@type': 'WebPage',
+			'@id': `${canonicalUrl}#webpage`,
+			url: canonicalUrl,
+			name: project.pageTitle,
+			description: project.metaDescription,
+			inLanguage: 'es',
+			isPartOf: { '@id': 'https://samuelcanadas.com/#website' },
+			breadcrumb: { '@id': breadcrumbId },
+			mainEntity: { '@id': workId },
+		},
+		{
+			'@type': 'BreadcrumbList',
+			'@id': breadcrumbId,
+			itemListElement: [
+				{ '@type': 'ListItem', position: 1, name: 'Inicio', item: 'https://samuelcanadas.com/' },
+				{ '@type': 'ListItem', position: 2, name: 'Proyectos', item: 'https://samuelcanadas.com/#work' },
+				{ '@type': 'ListItem', position: 3, name: project.name, item: canonicalUrl },
+			],
+		},
+		{
+			'@type': 'CreativeWork',
+			'@id': workId,
+			name: project.name,
+			description: project.metaDescription,
+			url: canonicalUrl,
+			image: new URL(project.ogImage, 'https://samuelcanadas.com').href,
+			author: { '@id': 'https://samuelcanadas.com/#person' },
+			sameAs: project.officialUrl,
+		},
+	],
+};
+---
+
+<BaseLayout
+	title={project.pageTitle}
+	description={project.metaDescription}
+	canonicalPath={canonicalPath}
+	image={project.ogImage}
+	imageWidth={project.ogImageWidth}
+	imageHeight={project.ogImageHeight}
+	imageAlt={project.ogImageAlt}
+	type="article"
+	structuredData={structuredData}
+>
+	<Header />
+	<main class:list={['case-page', `case-page--${project.id}`]}>
+		<article>
+			<header class="case-page__hero container-wide">
+				<nav class="case-page__breadcrumb" aria-label="Breadcrumb">
+					<ol>
+						<li><a href="/">Inicio</a></li>
+						<li><a href="/#work">Proyectos</a></li>
+						<li aria-current="page">{project.name}</li>
+					</ol>
+				</nav>
+				<div class="case-page__heading">
+					<div>
+						<p class="eyebrow">{project.index} — Caso de estudio</p>
+						<h1>{project.name}</h1>
+					</div>
+					<div class="case-page__summary">
+						<p>{project.descriptor}</p>
+						<span>{project.areas} · {project.year}</span>
+					</div>
+				</div>
+				<figure class="case-page__cover">
+					<img src={project.cover} alt={project.coverAlt} width={project.coverWidth} height={project.coverHeight} loading="eager" decoding="async" fetchpriority="high" />
+					<img class="case-page__logo" src={project.logo} alt={`Logo de ${project.name}`} width={project.logoWidth} height={project.logoHeight} decoding="async" />
+				</figure>
+			</header>
+
+			<div class="case-page__chapters container-normal">
+				{project.chapters.map((chapter, index) => (
+					<section class="case-page__chapter" aria-labelledby={`${project.id}-chapter-${index + 1}`}>
+						<div class="case-page__chapter-copy">
+							<span>0{index + 1}</span>
+							<h2 id={`${project.id}-chapter-${index + 1}`}>{chapter.title}</h2>
+							<p>{chapter.copy}</p>
+						</div>
+						<figure class="case-page__chapter-media">
+							<img src={chapter.image} alt={chapter.alt} width={chapter.imageWidth} height={chapter.imageHeight} loading="lazy" decoding="async" />
+						</figure>
+					</section>
+				))}
+			</div>
+
+			<footer class="case-page__footer container-wide">
+				<a href="/#work">← Volver a proyectos</a>
+				<a href={project.officialUrl} target="_blank" rel="noopener noreferrer">{project.officialLabel} <span aria-hidden="true">↗</span></a>
+			</footer>
+		</article>
+	</main>
+</BaseLayout>

@@ -5,6 +5,7 @@ type Chapter = { title: string; copy: string; image?: string; alt?: string; imag
 
 type Project = {
 	id: 'nfl' | 'nova-unio';
+	slug: 'nova-fight-legacy' | 'nova-unio';
 	index: string;
 	name: string;
 	descriptor: string;
@@ -13,16 +14,20 @@ type Project = {
 	year: string;
 	cover: string;
 	coverAlt: string;
+	coverWidth: number;
+	coverHeight: number;
 	logo: string;
+	logoWidth: number;
+	logoHeight: number;
 	chapters: Chapter[];
 };
 
 const projects: Project[] = [
 	{
-		id: 'nfl', index: '02', name: 'Nova Fight Legacy',
+		id: 'nfl', slug: 'nova-fight-legacy', index: '02', name: 'Nova Fight Legacy',
 		descriptor: 'Marketing digital, identidad y comunicación', pulse: 'Pulso creativo',
 		areas: 'Marketing Digital · Identidad · Vídeo', year: '2026',
-		cover: '/images/projects/nfl/cover.webp', coverAlt: 'Equipo y luchadores de Nova Fight Legacy durante un evento', logo: '/images/projects/nfl/logo.svg',
+		cover: '/images/projects/nfl/cover.webp', coverAlt: 'Equipo y luchadores de Nova Fight Legacy durante un evento', coverWidth: 1400, coverHeight: 933, logo: '/images/projects/nfl/logo.svg', logoWidth: 1500, logoHeight: 1500,
 		chapters: [
 			{ title: 'Contexto', copy: 'Nova Fight Legacy nació en 2026 con la idea de crear un evento de MMA y grappling en Lloret de Mar, pero también con la intención de dar espacio al talento joven y amateur. Creemos que faltan promotoras que apuesten por peleadores que todavía están empezando y queremos que NFL también sirva para darles visibilidad y oportunidades.', image: '/images/projects/nfl/context-poster.webp', alt: 'Cartel principal de Nova Fight Legacy en Lloret de Mar', imageWidth: 689, imageHeight: 859 },
 			{ title: 'Mi papel', copy: 'Me encargo de prácticamente toda la parte visual y digital de NFL: carteles, publicaciones, reels, grabación y edición de vídeo, redes sociales y la comunicación de cada evento. También preparo el contenido de luchadores, combates, resultados y todo lo que se publica antes, durante y después del evento.', image: '/images/projects/nfl/fighter-renato-junior.webp', alt: 'Anuncio de Renato Junior diseñado para Nova Fight Legacy', imageWidth: 900, imageHeight: 1125 },
@@ -31,10 +36,10 @@ const projects: Project[] = [
 		],
 	},
 	{
-		id: 'nova-unio', index: '01', name: 'Nova Unió',
+		id: 'nova-unio', slug: 'nova-unio', index: '01', name: 'Nova Unió',
 		descriptor: 'Desarrollo web y producto digital', pulse: 'Pulso técnico',
 		areas: 'Desarrollo Web · Producto Digital', year: '2026',
-		cover: '/images/projects/nova-unio/cover.webp', coverAlt: 'Dos deportistas de Nova Unió junto a la jaula de entrenamiento', logo: '/images/projects/nova-unio/logo.svg',
+		cover: '/images/projects/nova-unio/cover.webp', coverAlt: 'Dos deportistas de Nova Unió junto a la jaula de entrenamiento', coverWidth: 720, coverHeight: 960, logo: '/images/projects/nova-unio/logo.svg', logoWidth: 596, logoHeight: 842,
 		chapters: [
 			{ title: 'Contexto', copy: 'Nova Unió empezó como mi proyecto final de Desarrollo de Aplicaciones Web. La idea inicial era crear una nueva web para el club, pero poco a poco el proyecto fue creciendo hasta incluir también una aplicación interna para gestionar buena parte del día a día.', image: '/images/projects/nova-unio/public-home.webp', alt: 'Página de inicio pública de Nova Unió', imageWidth: 1425, imageHeight: 676 },
 			{ title: 'Mi papel', copy: 'He llevado el proyecto prácticamente de principio a fin: diseño, desarrollo, base de datos, panel de gestión, dominio, hosting y despliegue. Además, al conocer el club desde dentro podía ir adaptando la web y la aplicación a problemas y necesidades reales.', image: '/images/projects/nova-unio/admin-dashboard-safe.webp', alt: 'Dashboard del panel privado de gestión de Nova Unió', imageWidth: 1600, imageHeight: 907 },
@@ -51,11 +56,19 @@ export default function ProjectShowcase() {
 	const modalScrollRef = useRef<HTMLDivElement>(null);
 	const modalContentRef = useRef<HTMLDivElement>(null);
 	const closeButtonRef = useRef<HTMLButtonElement>(null);
-	const triggerRef = useRef<HTMLButtonElement | null>(null);
+	const triggerRef = useRef<HTMLAnchorElement | null>(null);
 
-	function openProject(project: Project, trigger: HTMLButtonElement) {
+	function openProject(project: Project, trigger: HTMLAnchorElement) {
 		triggerRef.current = trigger;
 		setActiveProject(project);
+	}
+
+	function handleProjectClick(event: React.MouseEvent<HTMLAnchorElement>, project: Project) {
+		if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+		event.preventDefault();
+		event.currentTarget.style.setProperty('--pointer-x', '0');
+		event.currentTarget.style.setProperty('--pointer-y', '0');
+		openProject(project, event.currentTarget);
 	}
 
 	function closeProject() {
@@ -89,8 +102,8 @@ export default function ProjectShowcase() {
 		if (!section) return;
 		const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
 		const mediaItems = Array.from(section.querySelectorAll<HTMLElement>('[data-project-media]'));
-		let frame = 0;
 		const cleanups = mediaItems.map((media) => {
+			let frame = 0;
 			let x = 0;
 			let y = 0;
 			const paint = () => {
@@ -105,21 +118,32 @@ export default function ProjectShowcase() {
 				y = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
 				if (!frame) frame = requestAnimationFrame(paint);
 			};
-			const leave = () => {
+			const reset = () => {
 				x = 0;
 				y = 0;
 				if (!frame) frame = requestAnimationFrame(paint);
 			};
+			const handlePointerCapability = () => {
+				if (!finePointer.matches) reset();
+			};
+			media.style.setProperty('--pointer-x', '0');
+			media.style.setProperty('--pointer-y', '0');
 			media.addEventListener('pointermove', move, { passive: true });
-			media.addEventListener('pointerleave', leave);
+			media.addEventListener('pointerleave', reset);
+			media.addEventListener('pointercancel', reset);
+			finePointer.addEventListener('change', handlePointerCapability);
 			return () => {
 				media.removeEventListener('pointermove', move);
-				media.removeEventListener('pointerleave', leave);
+				media.removeEventListener('pointerleave', reset);
+				media.removeEventListener('pointercancel', reset);
+				finePointer.removeEventListener('change', handlePointerCapability);
+				cancelAnimationFrame(frame);
+				media.style.setProperty('--pointer-x', '0');
+				media.style.setProperty('--pointer-y', '0');
 			};
 		});
 		return () => {
 			cleanups.forEach((cleanup) => cleanup());
-			cancelAnimationFrame(frame);
 		};
 	}, []);
 
@@ -186,16 +210,16 @@ export default function ProjectShowcase() {
 			<div className="work__projects">
 				{[...projects].sort((a, b) => a.index.localeCompare(b.index)).map((project) => (
 					<article className={`project project--${project.id}`} key={project.id} data-project>
-						<button className="project__media" data-project-media type="button" onClick={(event) => openProject(project, event.currentTarget)} aria-label={`Ver proyecto ${project.name}`}>
-							<img className="project__cover" src={project.cover} alt="" loading="lazy" decoding="async" />
+						<a className="project__media" data-project-media href={`/proyectos/${project.slug}/`} onClick={(event) => handleProjectClick(event, project)} aria-label={`Ver proyecto ${project.name}`}>
+							<img className="project__cover" src={project.cover} alt="" width={project.coverWidth} height={project.coverHeight} loading="lazy" decoding="async" />
 							<span className="project__veil" aria-hidden="true"></span>
-							<img className="project__logo" src={project.logo} alt="" loading="lazy" decoding="async" />
+							<img className="project__logo" src={project.logo} alt="" width={project.logoWidth} height={project.logoHeight} loading="lazy" decoding="async" />
 							<span className="project__pulse">{project.pulse}</span>
 							<span className="project__media-index" aria-hidden="true">{project.index}</span>
-						</button>
+						</a>
 						<div className="project__meta">
 							<div><h3>{project.name}</h3><p>{project.descriptor}</p></div>
-							<button type="button" onClick={(event) => openProject(project, event.currentTarget)}>Ver proyecto <span aria-hidden="true">↗</span></button>
+							<a className="project__link" href={`/proyectos/${project.slug}/`} onClick={(event) => handleProjectClick(event, project)}>Ver proyecto <span aria-hidden="true">↗</span></a>
 						</div>
 					</article>
 				))}
@@ -212,8 +236,8 @@ export default function ProjectShowcase() {
 							<div className="project-modal__scroll-content" ref={modalContentRef}>
 							<div className="project-modal__intro"><p className="eyebrow">{activeProject.pulse}</p><h2 id="project-modal-title">{activeProject.name}</h2><p>{activeProject.descriptor}</p></div>
 							<div className="project-modal__hero">
-								<img src={activeProject.cover} alt={activeProject.coverAlt} loading="eager" decoding="async" />
-								<img className="project-modal__logo" src={activeProject.logo} alt={`Logo de ${activeProject.name}`} />
+								<img src={activeProject.cover} alt={activeProject.coverAlt} width={activeProject.coverWidth} height={activeProject.coverHeight} loading="eager" decoding="async" />
+								<img className="project-modal__logo" src={activeProject.logo} alt={`Logo de ${activeProject.name}`} width={activeProject.logoWidth} height={activeProject.logoHeight} />
 							</div>
 							<div className="project-modal__chapters" aria-label={`Case study de ${activeProject.name}`}>
 								{[activeProject.chapters.slice(0, 2), activeProject.chapters.slice(2, 4)].map((row, rowIndex) => (

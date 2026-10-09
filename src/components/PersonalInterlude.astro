@@ -21,10 +21,10 @@
 					<span>Descargar CV</span><i aria-hidden="true">↓</i>
 				</a>
 			</div>
-			<nav class="interlude-contact__links" aria-label="Vías de contacto">
+			<nav class="interlude-contact__links" aria-label="Vías de contacto" data-contact-links>
 				<a class="interlude-contact__link" data-contact-link href="mailto:samuelcanadas2711@gmail.com" aria-label="Enviar un email a samuelcanadas2711@gmail.com"><span>Email</span><small>samuelcanadas2711@gmail.com</small></a>
-				<a class="interlude-contact__link" data-contact-link href="https://www.linkedin.com/in/scanadas/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn de Samuel Cañadas, se abre en una pestaña nueva"><span>LinkedIn</span><i aria-hidden="true">↗</i></a>
-				<a class="interlude-contact__link" data-contact-link href="https://github.com/samuiitm" target="_blank" rel="noopener noreferrer" aria-label="GitHub de Samuel Cañadas, se abre en una pestaña nueva"><span>GitHub</span><i aria-hidden="true">↗</i></a>
+				<a class="interlude-contact__link" data-contact-link href="https://www.linkedin.com/in/scanadas" target="_blank" rel="me noopener noreferrer" aria-label="LinkedIn de Samuel Cañadas, se abre en una pestaña nueva"><span>LinkedIn</span><i aria-hidden="true">↗</i></a>
+				<a class="interlude-contact__link" data-contact-link href="https://github.com/samuiitm" target="_blank" rel="me noopener noreferrer" aria-label="GitHub de Samuel Cañadas, se abre en una pestaña nueva"><span>GitHub</span><i aria-hidden="true">↗</i></a>
 			</nav>
 			<footer class="interlude-contact__footer" data-contact-footer>
 				<span>Samuel Cañadas · 2026/27</span>
@@ -44,6 +44,7 @@
 	const contactTitle = section?.querySelector<HTMLElement>('[data-contact-title]');
 	const contactSubtitle = section?.querySelector<HTMLElement>('[data-contact-subtitle]');
 	const contactCv = section?.querySelector<HTMLElement>('[data-contact-cv]');
+	const contactLinksContainer = section?.querySelector<HTMLElement>('[data-contact-links]');
 	const contactLinks = section?.querySelectorAll<HTMLElement>('[data-contact-link]');
 	const contactFooter = section?.querySelector<HTMLElement>('[data-contact-footer]');
 	const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -104,13 +105,12 @@
 			}
 			const contactTransition = smoothstep(0.82, 0.9, progress);
 			section.style.setProperty('--contact-settle', smoothstep(0.82, 1, progress).toFixed(4));
-			document.documentElement.style.setProperty('--header-contact-progress', contactTransition.toFixed(4));
-			document.querySelector('[data-site-header]')?.classList.toggle('is-contact-transition', contactTransition > 0);
 			setReveal(shade, contactTransition);
 			setReveal(contactEyebrow, smoothstep(0.83, 0.88, progress));
 			setReveal(contactTitle, smoothstep(0.84, 0.9, progress));
 			setReveal(contactSubtitle, smoothstep(0.87, 0.92, progress));
 			setReveal(contactCv, smoothstep(0.89, 0.94, progress));
+			setReveal(contactLinksContainer, smoothstep(0.9, 0.94, progress));
 			setReveal(contactLinks?.[0], smoothstep(0.91, 0.95, progress));
 			setReveal(contactLinks?.[1], smoothstep(0.93, 0.97, progress));
 			setReveal(contactLinks?.[2], smoothstep(0.95, 0.985, progress));
@@ -136,8 +136,6 @@
 		if (reduceMotion.matches) {
 			section.classList.add('is-reduced-motion');
 			section.classList.add('is-contact-active');
-			document.documentElement.style.setProperty('--header-contact-progress', '1');
-			document.querySelector('[data-site-header]')?.classList.add('is-contact-transition');
 			if (contact) {
 				contact.inert = false;
 				contact.setAttribute('aria-hidden', 'false');
@@ -171,8 +169,6 @@
 				window.removeEventListener('resize', handleResize);
 				window.removeEventListener('portfolio:header-resize', handleResize);
 				window.cancelAnimationFrame(frame);
-				document.documentElement.style.removeProperty('--header-contact-progress');
-				document.querySelector('[data-site-header]')?.classList.remove('is-contact-transition');
 			}, { once: true });
 		}
 	}

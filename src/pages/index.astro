@@ -8,11 +8,63 @@ import PersonalInterlude from '../components/PersonalInterlude.astro';
 import ProjectShowcase from '../components/ProjectShowcase';
 import ScrollStatement from '../components/ScrollStatement.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+const homeStructuredData = {
+	'@context': 'https://schema.org',
+	'@graph': [
+		{
+			'@type': 'WebSite',
+			'@id': 'https://samuelcanadas.com/#website',
+			url: 'https://samuelcanadas.com/',
+			name: 'Samuel Cañadas',
+			alternateName: 'samuelcanadas',
+			inLanguage: 'es',
+		},
+		{
+			'@type': 'Person',
+			'@id': 'https://samuelcanadas.com/#person',
+			name: 'Samuel Cañadas Ruiz',
+			alternateName: ['Samuel Cañadas', 'samuiitm'],
+			url: 'https://samuelcanadas.com/',
+			jobTitle: 'Desarrollador Web',
+			email: 'samuelcanadas2711@gmail.com',
+			homeLocation: {
+				'@type': 'Place',
+				name: 'Lloret de Mar, Girona, España',
+			},
+			description: 'Desarrollador Web | Marketing Digital & Creativo',
+			knowsAbout: ['Desarrollo web', 'Marketing digital', 'Social media', 'Diseño gráfico', 'Edición de vídeo', 'Inteligencia artificial'],
+			sameAs: [
+				'https://www.linkedin.com/in/scanadas',
+				'https://github.com/samuiitm',
+				'https://www.instagram.com/samuiitm/',
+				'https://www.tiktok.com/@samuiitm',
+				'https://x.com/samuiitm',
+				'https://www.youtube.com/@samuiitm',
+			],
+		},
+		{
+			'@type': 'ProfilePage',
+			'@id': 'https://samuelcanadas.com/#profile-page',
+			url: 'https://samuelcanadas.com/',
+			name: 'Samuel Cañadas | Desarrollo Web & Marketing Digital',
+			inLanguage: 'es',
+			isPartOf: { '@id': 'https://samuelcanadas.com/#website' },
+			mainEntity: { '@id': 'https://samuelcanadas.com/#person' },
+		},
+	],
+};
 ---
 
 <BaseLayout
-	title="Samuel Cañadas — Portfolio"
-	description="Portfolio de Samuel Cañadas, Desarrollo Web y Marketing Digital & Creativo."
+	title="Samuel Cañadas | Desarrollo Web & Marketing Digital"
+	description="Portfolio de Samuel Cañadas, desarrollador web con experiencia en marketing digital, diseño, vídeo y social media. Proyectos: Nova Unió y Nova Fight Legacy."
+	canonicalPath="/"
+	image="/og/samuel-canadas.png"
+	imageWidth={1200}
+	imageHeight={630}
+	imageAlt="Samuel Cañadas — Desarrollo Web y Marketing Digital & Creativo"
+	structuredData={homeStructuredData}
 >
 	<Header />
 	<main>

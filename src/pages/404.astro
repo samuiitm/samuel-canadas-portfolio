@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+---
+
+<BaseLayout
+	title="Página no encontrada | Samuel Cañadas"
+	description="La página que buscas no existe."
+	canonicalPath="/404/"
+	robots="noindex, nofollow"
+>
+	<Header />
+	<main class="not-found container-normal">
+		<p class="eyebrow">404 — Página no encontrada</p>
+		<h1>Esta página no está aquí.</h1>
+		<p>Puede que el enlace haya cambiado o que la dirección no sea correcta.</p>
+		<a href="/">Volver al portfolio <span aria-hidden="true">→</span></a>
+	</main>
+</BaseLayout>

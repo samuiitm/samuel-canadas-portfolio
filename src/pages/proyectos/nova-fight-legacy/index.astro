@@ -1,0 +1,8 @@
+---
+import ProjectPage from '../../../components/ProjectPage.astro';
+import { getProject } from '../../../data/projects';
+
+const project = getProject('nfl');
+---
+
+<ProjectPage project={project} />

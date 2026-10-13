@@ -7,6 +7,7 @@ import Personal from '../components/Personal.astro';
 import PersonalInterlude from '../components/PersonalInterlude.astro';
 import ProjectShowcase from '../components/ProjectShowcase';
 import ScrollStatement from '../components/ScrollStatement.astro';
+import VideoArchive from '../components/VideoArchive';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const homeStructuredData = {
@@ -73,6 +74,7 @@ const homeStructuredData = {
 		<ProjectShowcase client:load />
 		<InternationalNote />
 		<Journey />
+		<VideoArchive client:load />
 		<Personal />
 		<PersonalInterlude />
 	</main>

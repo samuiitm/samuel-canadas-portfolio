@@ -1,8 +1,10 @@
+import type { Locale } from '../lib/i18n';
+
 export type VideoCategory = 'NFL' | 'Personal' | 'Otros';
 
 export type VideoItem = {
 	id: string;
-	title: string;
+	title: Record<Locale, string>;
 	category: VideoCategory;
 	featured: boolean;
 	date: string;
@@ -16,7 +18,7 @@ export type VideoItem = {
 export const videos: VideoItem[] = [
 	{
 		id: 'nfl-01',
-		title: 'NFL 1 — Resumen del evento',
+		title: { es: 'NFL 1 — Resumen del evento', en: 'NFL 1 — Event recap' },
 		category: 'NFL',
 		featured: false,
 		date: '2026-07-27',
@@ -27,7 +29,7 @@ export const videos: VideoItem[] = [
 	},
 	{
 		id: 'nfl-02',
-		title: 'NFL 1 — Venta de entradas',
+		title: { es: 'NFL 1 — Venta de entradas', en: 'NFL 1 — Ticket sales' },
 		category: 'NFL',
 		featured: false,
 		date: '2026-05-27',
@@ -38,7 +40,7 @@ export const videos: VideoItem[] = [
 	},
 	{
 		id: 'nfl-03',
-		title: 'Entrevista — Renato Junior',
+		title: { es: 'Entrevista — Renato Junior', en: 'Interview — Renato Junior' },
 		category: 'NFL',
 		featured: false,
 		date: '2026-05-31',
@@ -49,7 +51,7 @@ export const videos: VideoItem[] = [
 	},
 	{
 		id: 'nfl-05',
-		title: 'NFL 1 — Promo',
+		title: { es: 'NFL 1 — Promo', en: 'NFL 1 — Promo' },
 		category: 'NFL',
 		featured: false,
 		date: '2026-06-27',
@@ -60,7 +62,7 @@ export const videos: VideoItem[] = [
 	},
 	{
 		id: 'nfl-06',
-		title: 'Cara a cara — Combate estelar',
+		title: { es: 'Cara a cara — Combate estelar', en: 'Face-off — Main event' },
 		category: 'NFL',
 		featured: false,
 		date: '2026-06-26',
@@ -70,7 +72,7 @@ export const videos: VideoItem[] = [
 	},
 	{
 		id: 'nfl-07',
-		title: 'Ayoub Regrag vs. Alan Luna — KO',
+		title: { es: 'Ayoub Regrag vs. Alan Luna — KO', en: 'Ayoub Regrag vs. Alan Luna — KO' },
 		category: 'NFL',
 		featured: true,
 		date: '2026-06-30',
@@ -80,7 +82,7 @@ export const videos: VideoItem[] = [
 	},
 	{
 		id: 'nfl-10',
-		title: 'Miguel Pineda vs. Pablo Pérez — La remontada',
+		title: { es: 'Miguel Pineda vs. Pablo Pérez — La remontada', en: 'Miguel Pineda vs. Pablo Pérez — The comeback' },
 		category: 'NFL',
 		featured: false,
 		date: '2026-06-29',
@@ -90,7 +92,7 @@ export const videos: VideoItem[] = [
 	},
 	{
 		id: 'personal-01',
-		title: 'Erasmus Malta 2026 — Resumen',
+		title: { es: 'Erasmus Malta 2026 — Resumen', en: 'Erasmus Malta 2026 — Recap' },
 		category: 'Personal',
 		featured: true,
 		date: '2026-05-23',
@@ -100,7 +102,7 @@ export const videos: VideoItem[] = [
 	},
 	{
 		id: 'otros-01',
-		title: 'Alejo Luna — AFL 41',
+		title: { es: 'Alejo Luna — AFL 41', en: 'Alejo Luna — AFL 41' },
 		category: 'Otros',
 		featured: true,
 		date: '2026-02-13',
@@ -110,7 +112,7 @@ export const videos: VideoItem[] = [
 	},
 	{
 		id: 'otros-02',
-		title: 'Campeonato de Cataluña de Combat Sambo — Mejores momentos',
+		title: { es: 'Campeonato de Cataluña de Combat Sambo — Mejores momentos', en: 'Catalan Combat Sambo Championship — Highlights' },
 		category: 'Otros',
 		featured: false,
 		date: '2026-02-14',

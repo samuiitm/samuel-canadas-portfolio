@@ -1,0 +1,93 @@
+---
+import Header from './Header.astro';
+import Hero from './Hero.astro';
+import InternationalNote from './InternationalNote.astro';
+import Journey from './Journey.astro';
+import Personal from './Personal.astro';
+import PersonalInterlude from './PersonalInterlude.astro';
+import ProjectShowcase from './ProjectShowcase';
+import ScrollStatement from './ScrollStatement.astro';
+import VideoArchive from './VideoArchive';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { homeContent } from '../data/content';
+import { getHomePath, type Locale } from '../lib/i18n';
+
+interface Props { locale: Locale; }
+
+const { locale } = Astro.props;
+const content = homeContent[locale];
+const canonicalPath = getHomePath(locale);
+const canonicalUrl = new URL(canonicalPath, 'https://samuelcanadas.com').href;
+
+const homeStructuredData = {
+	'@context': 'https://schema.org',
+	'@graph': [
+		{
+			'@type': 'WebSite',
+			'@id': 'https://samuelcanadas.com/#website',
+			url: 'https://samuelcanadas.com/',
+			name: 'Samuel Cañadas',
+			alternateName: 'samuelcanadas',
+			inLanguage: ['es', 'en'],
+		},
+		{
+			'@type': 'Person',
+			'@id': 'https://samuelcanadas.com/#person',
+			name: 'Samuel Cañadas Ruiz',
+			alternateName: ['Samuel Cañadas', 'samuiitm'],
+			url: 'https://samuelcanadas.com/',
+			jobTitle: content.seo.jobTitle,
+			email: 'samuelcanadas2711@gmail.com',
+			homeLocation: {
+				'@type': 'Place',
+				name: content.seo.location,
+			},
+			description: content.seo.personDescription,
+			knowsAbout: content.seo.knowsAbout,
+			sameAs: [
+				'https://www.linkedin.com/in/scanadas',
+				'https://github.com/samuiitm',
+				'https://www.instagram.com/samuiitm/',
+				'https://www.tiktok.com/@samuiitm',
+				'https://x.com/samuiitm',
+				'https://www.youtube.com/@samuiitm',
+			],
+		},
+		{
+			'@type': 'ProfilePage',
+			'@id': `${canonicalUrl}#profile-page`,
+			url: canonicalUrl,
+			name: content.seo.title,
+			description: content.seo.description,
+			inLanguage: locale,
+			isPartOf: { '@id': 'https://samuelcanadas.com/#website' },
+			mainEntity: { '@id': 'https://samuelcanadas.com/#person' },
+		},
+	],
+};
+---
+
+<BaseLayout
+	title={content.seo.title}
+	description={content.seo.description}
+	lang={locale}
+	canonicalPath={canonicalPath}
+	alternates={{ es: '/', en: '/en/', xDefault: '/' }}
+	image="/og/samuel-canadas.png"
+	imageWidth={1200}
+	imageHeight={630}
+	imageAlt={content.seo.imageAlt}
+	structuredData={homeStructuredData}
+>
+	<Header locale={locale} />
+	<main>
+		<Hero locale={locale} />
+		<ScrollStatement locale={locale} />
+		<ProjectShowcase locale={locale} client:load />
+		<InternationalNote locale={locale} />
+		<Journey locale={locale} />
+		<VideoArchive locale={locale} client:load />
+		<Personal locale={locale} />
+		<PersonalInterlude locale={locale} />
+	</main>
+</BaseLayout>

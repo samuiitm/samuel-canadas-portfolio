@@ -1,12 +1,14 @@
 ---
 import '../styles/global.css';
 import InteractionLayer from '../components/InteractionLayer.astro';
+import LanguageNavigation from '../components/LanguageNavigation.astro';
 import SmoothScroll from '../components/SmoothScroll.astro';
+import type { Locale } from '../lib/i18n';
 
 interface Props {
 	title: string;
 	description: string;
-	lang?: 'es' | 'en';
+	lang?: Locale;
 	canonicalPath?: string;
 	image?: string;
 	imageWidth?: number;
@@ -15,6 +17,7 @@ interface Props {
 	type?: 'website' | 'article';
 	robots?: string;
 	structuredData?: Record<string, unknown>;
+	alternates?: { es: string; en: string; xDefault?: string };
 }
 
 const {
@@ -25,15 +28,19 @@ const {
 	image = '/og/samuel-canadas.png',
 	imageWidth = 1200,
 	imageHeight = 630,
-	imageAlt = 'Samuel Cañadas — Desarrollo Web y Marketing Digital & Creativo',
+	imageAlt,
 	type = 'website',
 	robots = 'index, follow',
 	structuredData,
+	alternates,
 } = Astro.props;
 
 const canonicalUrl = new URL(canonicalPath, Astro.site);
 const imageUrl = new URL(image, Astro.site);
+const resolvedImageAlt = imageAlt ?? (lang === 'en' ? 'Samuel Cañadas — Web Development and Digital Marketing & Creative' : 'Samuel Cañadas — Desarrollo Web y Marketing Digital & Creativo');
 const imageType = image.endsWith('.webp') ? 'image/webp' : image.endsWith('.jpg') || image.endsWith('.jpeg') ? 'image/jpeg' : 'image/png';
+const openGraphLocale = lang === 'en' ? 'en_US' : 'es_ES';
+const alternateOpenGraphLocale = lang === 'en' ? 'es_ES' : 'en_US';
 ---
 
 <!doctype html>
@@ -46,6 +53,9 @@ const imageType = image.endsWith('.webp') ? 'image/webp' : image.endsWith('.jpg'
 		<meta name="robots" content={robots} />
 		<meta name="generator" content={Astro.generator} />
 		<link rel="canonical" href={canonicalUrl} />
+		{alternates && <link rel="alternate" hreflang="es" href={new URL(alternates.es, Astro.site)} />}
+		{alternates && <link rel="alternate" hreflang="en" href={new URL(alternates.en, Astro.site)} />}
+		{alternates && <link rel="alternate" hreflang="x-default" href={new URL(alternates.xDefault ?? alternates.es, Astro.site)} />}
 		<link rel="sitemap" href="/sitemap-index.xml" />
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />
@@ -55,14 +65,15 @@ const imageType = image.endsWith('.webp') ? 'image/webp' : image.endsWith('.jpg'
 		<meta property="og:image:type" content={imageType} />
 		<meta property="og:image:width" content={String(imageWidth)} />
 		<meta property="og:image:height" content={String(imageHeight)} />
-		<meta property="og:image:alt" content={imageAlt} />
+		<meta property="og:image:alt" content={resolvedImageAlt} />
 		<meta property="og:site_name" content="Samuel Cañadas" />
-		<meta property="og:locale" content="es_ES" />
+		<meta property="og:locale" content={openGraphLocale} />
+		<meta property="og:locale:alternate" content={alternateOpenGraphLocale} />
 		<meta name="twitter:card" content="summary_large_image" />
 		<meta name="twitter:title" content={title} />
 		<meta name="twitter:description" content={description} />
 		<meta name="twitter:image" content={imageUrl} />
-		<meta name="twitter:image:alt" content={imageAlt} />
+		<meta name="twitter:image:alt" content={resolvedImageAlt} />
 		<link rel="icon" href="/favicon.ico" sizes="any" />
 		<link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16" />
 		<link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
@@ -74,6 +85,15 @@ const imageType = image.endsWith('.webp') ? 'image/webp' : image.endsWith('.jpg'
 		{structuredData && <script type="application/ld+json" set:html={JSON.stringify(structuredData)}></script>}
 		<script is:inline>
 			(() => {
+				try {
+					const languagePosition = JSON.parse(sessionStorage.getItem('portfolio-language-position') || 'null');
+					if (languagePosition?.targetPath === window.location.pathname && Date.now() - languagePosition.createdAt <= 15_000) {
+						document.documentElement.dataset.languageTransition = 'true';
+					}
+				} catch {
+					sessionStorage.removeItem('portfolio-language-position');
+				}
+
 				const savedTheme = localStorage.getItem('portfolio-theme');
 				const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 				const theme = savedTheme === 'light' || savedTheme === 'dark'
@@ -87,7 +107,8 @@ const imageType = image.endsWith('.webp') ? 'image/webp' : image.endsWith('.jpg'
 	</head>
 	<body>
 		<SmoothScroll />
-		<InteractionLayer />
+		<InteractionLayer locale={lang} />
 		<slot />
+		<LanguageNavigation />
 	</body>
 </html>

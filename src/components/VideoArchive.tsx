@@ -1,26 +1,33 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent } from 'react';
+import { homeContent } from '../data/content';
 import { videos, type VideoCategory, type VideoItem } from '../data/videos';
+import type { Locale } from '../lib/i18n';
 
 type ArchiveCategory = 'Destacados' | VideoCategory;
 
 const categories: ArchiveCategory[] = ['Destacados', 'NFL', 'Personal', 'Otros'];
-const dateFormatter = new Intl.DateTimeFormat('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
-
-function formatDate(date: string) {
-	return dateFormatter.format(new Date(`${date}T12:00:00`)).replace('.', '');
-}
-
 function thumbnailUrl(video: VideoItem) {
 	return video.thumbnail ?? `https://image.mux.com/${video.playbackId}/thumbnail.webp?width=560&time=${video.thumbnailTime ?? 0}`;
 }
 
-function playerUrl(video: VideoItem) {
-	const title = encodeURIComponent(video.title);
+function playerUrl(video: VideoItem, localizedTitle: string) {
+	const title = encodeURIComponent(localizedTitle);
 	return `https://player.mux.com/${video.playbackId}?metadata-video-title=${title}&accent-color=%23b79adb&volume=0.5&no-volume-pref=true`;
 }
 
-export default function VideoArchive() {
+export default function VideoArchive({ locale = 'es' }: { locale?: Locale }) {
+	const copy = homeContent[locale].archive;
+	const dateFormatter = useMemo(() => new Intl.DateTimeFormat(locale === 'en' ? 'en-GB' : 'es-ES', { day: '2-digit', month: 'short', year: 'numeric' }), [locale]);
+	const formatDate = (date: string) => dateFormatter.format(new Date(`${date}T12:00:00`)).replace('.', '');
+	const categoryLabel = (category: ArchiveCategory) => category === 'Destacados'
+		? copy.categories.featured
+		: category === 'NFL'
+			? copy.categories.nfl
+			: category === 'Personal'
+				? copy.categories.personal
+				: copy.categories.other;
+	const videoTitle = (video: VideoItem) => video.title[locale];
 	const [activeCategory, setActiveCategory] = useState<ArchiveCategory>('Destacados');
 	const [activeVideo, setActiveVideo] = useState<VideoItem | null>(null);
 	const [playerMounted, setPlayerMounted] = useState(false);
@@ -148,21 +155,21 @@ export default function VideoArchive() {
 	}, [isOpen, activeIndex, filteredVideos]);
 
 	return (
-		<section className="archive depth-level-c" id="archivo" aria-labelledby="archive-title">
+		<section className="archive depth-level-c" id="archivo" aria-labelledby="archive-title" data-language-section="archive">
 			<div className="archive__inner container-wide">
 				<header className="archive__heading">
 					<div>
-						<p className="eyebrow">Archivo audiovisual</p>
-						<h2 id="archive-title">Archivo.</h2>
+						<p className="eyebrow">{copy.eyebrow}</p>
+						<h2 id="archive-title">{copy.title}</h2>
 					</div>
-					<p>Una selección de piezas grabadas, editadas y publicadas entre proyectos, eventos y experiencias personales.</p>
+					<p>{copy.intro}</p>
 				</header>
 
 				<div className="archive-app">
 					<div className="archive-app__workspace">
-						<aside className="archive-app__sidebar" aria-label="Categorías del archivo">
-							<p>Colecciones</p>
-							<div className="archive-app__tabs" role="tablist" aria-label="Filtrar vídeos">
+						<aside className="archive-app__sidebar" aria-label={copy.categoriesLabel}>
+							<p>{copy.collections}</p>
+							<div className="archive-app__tabs" role="tablist" aria-label={copy.filterLabel}>
 								{categories.map((category, index) => (
 									<button
 										key={category}
@@ -178,24 +185,24 @@ export default function VideoArchive() {
 										onKeyDown={(event) => handleCategoryKeyDown(event, index)}
 									>
 										<span className="archive-app__folder" aria-hidden="true"></span>
-										<span>{category}</span>
+										<span>{categoryLabel(category)}</span>
 										<small>{counts[category]}</small>
 									</button>
 								))}
 							</div>
-							<p className="archive-app__total">{videos.length} vídeos en el archivo</p>
+							<p className="archive-app__total">{videos.length} {copy.videosInArchive}</p>
 						</aside>
 
 						<div className="archive-app__panel" id="archive-panel" role="tabpanel" aria-labelledby={`archive-tab-${activeCategory.toLowerCase()}`}>
 							<header className="archive-app__panel-heading">
-								<div><span>Biblioteca</span><h3>{activeCategory}</h3></div>
-								<p>{filteredVideos.length} {filteredVideos.length === 1 ? 'elemento' : 'elementos'}</p>
+								<div><span>{copy.library}</span><h3>{categoryLabel(activeCategory)}</h3></div>
+								<p>{filteredVideos.length} {filteredVideos.length === 1 ? copy.item : copy.items}</p>
 							</header>
 
 							<div className="archive-grid">
 								{filteredVideos.map((video) => (
 									<article className="archive-card" key={video.id}>
-										<button type="button" onClick={(event: ReactMouseEvent<HTMLButtonElement>) => openVideo(video, event.currentTarget)} aria-label={`Reproducir ${video.title}`}>
+										<button type="button" onClick={(event: ReactMouseEvent<HTMLButtonElement>) => openVideo(video, event.currentTarget)} aria-label={`${copy.play} ${videoTitle(video)}`}>
 											<span className="archive-card__poster">
 												<img src={thumbnailUrl(video)} alt="" width="560" height="996" loading="lazy" decoding="async" onError={(event) => { event.currentTarget.hidden = true; }} />
 												<span className="archive-card__play" aria-hidden="true">
@@ -203,12 +210,12 @@ export default function VideoArchive() {
 														<span className="archive-card__play-icon"></span>
 													</span>
 												</span>
-												{video.featured && <span className="archive-card__featured">Destacado</span>}
-												<span className="archive-card__duration">{video.duration ?? 'Vídeo'}</span>
+												{video.featured && <span className="archive-card__featured">{copy.featured}</span>}
+												<span className="archive-card__duration">{video.duration ?? copy.video}</span>
 											</span>
 											<span className="archive-card__content">
-												<strong>{video.title}</strong>
-												<span><time dateTime={video.date}>{formatDate(video.date)}</time><i aria-hidden="true"></i>{video.category}</span>
+												<strong>{videoTitle(video)}</strong>
+												<span><time dateTime={video.date}>{formatDate(video.date)}</time><i aria-hidden="true"></i>{categoryLabel(video.category)}</span>
 											</span>
 										</button>
 									</article>
@@ -222,23 +229,23 @@ export default function VideoArchive() {
 			{activeVideo && (
 				<div className="archive-modal-backdrop" onMouseDown={(event) => event.target === event.currentTarget && closeVideo()}>
 					<div className="archive-modal" ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="archive-modal-title">
-						<button className="archive-modal__close" ref={closeButtonRef} type="button" onClick={closeVideo} aria-label={`Cerrar ${activeVideo.title}`}>×</button>
+						<button className="archive-modal__close" ref={closeButtonRef} type="button" onClick={closeVideo} aria-label={`${copy.close} ${videoTitle(activeVideo)}`}>×</button>
 						<div className="archive-modal__content">
 							<div className={`archive-modal__player${playerReady ? ' is-ready' : ''}`}>
 								<img className="archive-modal__poster" src={thumbnailUrl(activeVideo)} alt="" width="560" height="996" />
-								<span className="archive-modal__loading" aria-live="polite">Preparando vídeo…</span>
-								{playerMounted && <iframe key={activeVideo.id} src={playerUrl(activeVideo)} title={`Reproductor de ${activeVideo.title}`} allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture" allowFullScreen loading="eager" onLoad={() => setPlayerReady(true)}></iframe>}
+								<span className="archive-modal__loading" aria-live="polite">{copy.preparing}</span>
+								{playerMounted && <iframe key={activeVideo.id} src={playerUrl(activeVideo, videoTitle(activeVideo))} title={`${copy.player} ${videoTitle(activeVideo)}`} allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture" allowFullScreen loading="eager" onLoad={() => setPlayerReady(true)}></iframe>}
 							</div>
 							<div className="archive-modal__details">
-								<p className="eyebrow">{activeVideo.category}</p>
-								<h3 id="archive-modal-title">{activeVideo.title}</h3>
-								<div className="archive-modal__metadata"><time dateTime={activeVideo.date}>{formatDate(activeVideo.date)}</time><span>{activeVideo.duration ?? 'Vídeo vertical'}</span></div>
-								{activeVideo.originalUrl && <a href={activeVideo.originalUrl} target="_blank" rel="noopener noreferrer">Ver publicación original <span aria-hidden="true">↗</span></a>}
+								<p className="eyebrow">{categoryLabel(activeVideo.category)}</p>
+								<h3 id="archive-modal-title">{videoTitle(activeVideo)}</h3>
+								<div className="archive-modal__metadata"><time dateTime={activeVideo.date}>{formatDate(activeVideo.date)}</time><span>{activeVideo.duration ?? copy.verticalVideo}</span></div>
+								{activeVideo.originalUrl && <a href={activeVideo.originalUrl} target="_blank" rel="noopener noreferrer">{copy.viewOriginal} <span aria-hidden="true">↗</span></a>}
 								{filteredVideos.length > 1 && (
-									<nav className="archive-modal__navigation" aria-label="Navegación entre vídeos">
-										<button type="button" onClick={() => showRelativeVideo(-1)} aria-label="Vídeo anterior">← <span>Anterior</span></button>
+									<nav className="archive-modal__navigation" aria-label={copy.navigationLabel}>
+										<button type="button" onClick={() => showRelativeVideo(-1)} aria-label={copy.previousLabel}>← <span>{copy.previous}</span></button>
 										<span>{activeIndex + 1} / {filteredVideos.length}</span>
-										<button type="button" onClick={() => showRelativeVideo(1)} aria-label="Vídeo siguiente"><span>Siguiente</span> →</button>
+										<button type="button" onClick={() => showRelativeVideo(1)} aria-label={copy.nextLabel}><span>{copy.next}</span> →</button>
 									</nav>
 								)}
 							</div>

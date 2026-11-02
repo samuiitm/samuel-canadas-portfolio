@@ -1,13 +1,22 @@
-<aside class="international-note container-normal" aria-labelledby="international-title">
-	<p class="eyebrow">Nota internacional</p>
+---
+import { homeContent } from '../data/content';
+import { defaultLocale, type Locale } from '../lib/i18n';
+
+interface Props { locale?: Locale; }
+const { locale = defaultLocale } = Astro.props;
+const copy = homeContent[locale].international;
+---
+
+<aside class="international-note container-normal" aria-labelledby="international-title" data-language-section="international">
+	<p class="eyebrow">{copy.eyebrow}</p>
 	<div class="international-note__content">
-		<h2 id="international-title">Decorama, Malta</h2>
-		<p>Erasmus+ · Diseño y desarrollo web · Inglés · Autonomía</p>
+		<h2 id="international-title">{copy.title}</h2>
+		<p>{copy.description}</p>
 	</div>
 	<figure class="international-note__asset">
 		<img
 			src="/images/projects/decorama-art-home.webp"
-			alt="Página de inicio de Decorama Art con su navegación, titular principal y productos decorativos"
+			alt={copy.imageAlt}
 			width="1902"
 			height="1079"
 			loading="lazy"
@@ -20,8 +29,8 @@
 		href="https://www.decoramaart.com/"
 		target="_blank"
 		rel="noopener noreferrer"
-		aria-label="Visitar Decorama Art"
+		aria-label={copy.linkLabel}
 	>
-		<span class="sr-only">Visitar Decorama Art</span>
+		<span class="sr-only">{copy.linkLabel}</span>
 	</a>
 </aside>

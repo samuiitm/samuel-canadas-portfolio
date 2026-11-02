@@ -1,7 +1,15 @@
+---
+import { defaultLocale, type Locale } from '../lib/i18n';
+
+interface Props { locale?: Locale; }
+const { locale = defaultLocale } = Astro.props;
+const scrollbarLabel = locale === 'en' ? 'Page scroll position' : 'Desplazamiento de la página';
+---
+
 <div class="custom-cursor" aria-hidden="true" data-custom-cursor></div>
 <div class="custom-scrollbar" data-custom-scrollbar>
 	<div class="custom-scrollbar__track" data-scrollbar-track>
-		<button class="custom-scrollbar__thumb" type="button" role="scrollbar" aria-label="Desplazamiento de la página" aria-orientation="vertical" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-scrollbar-thumb></button>
+		<button class="custom-scrollbar__thumb" type="button" role="scrollbar" aria-label={scrollbarLabel} aria-orientation="vertical" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-scrollbar-thumb></button>
 	</div>
 </div>
 

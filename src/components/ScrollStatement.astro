@@ -1,19 +1,23 @@
-<section class="statement depth-level-a" id="statement" aria-labelledby="statement-title" data-scroll-statement>
+---
+import { homeContent } from '../data/content';
+import { defaultLocale, type Locale } from '../lib/i18n';
+
+interface Props { locale?: Locale; }
+const { locale = defaultLocale } = Astro.props;
+const copy = homeContent[locale].statement;
+---
+
+<section class="statement depth-level-a" id="statement" aria-labelledby="statement-title" data-scroll-statement data-language-section="statement">
 	<div class="statement__sticky">
 		<div class="statement__inner container-normal">
-			<p class="eyebrow">01 — Una forma de trabajar</p>
+			<p class="eyebrow">{copy.eyebrow}</p>
 			<h2 class="statement__text" id="statement-title">
-			<span class="sr-only">Puedo estar con una web y al rato con un cartel, una publicación o detrás de la cámara.</span>
+			<span class="sr-only">{copy.full}</span>
 			<span class="statement__lines statement__lines--desktop" data-statement-lines aria-hidden="true">
-				<span class="statement__line"><span class="statement__line-base">Puedo estar con una web</span><span class="statement__line-reveal" data-statement-line-fill><span class="statement__line-fill">Puedo estar con una web</span></span></span>
-				<span class="statement__line"><span class="statement__line-base">y al rato con un cartel, una</span><span class="statement__line-reveal" data-statement-line-fill><span class="statement__line-fill">y al rato con un cartel, una</span></span></span>
-				<span class="statement__line"><span class="statement__line-base">publicación o detrás de la cámara.</span><span class="statement__line-reveal" data-statement-line-fill><span class="statement__line-fill">publicación o detrás de la cámara.</span></span></span>
+				{copy.desktop.map((line) => <span class="statement__line"><span class="statement__line-base">{line}</span><span class="statement__line-reveal" data-statement-line-fill><span class="statement__line-fill">{line}</span></span></span>)}
 			</span>
 			<span class="statement__lines statement__lines--mobile" data-statement-lines aria-hidden="true">
-				<span class="statement__line"><span class="statement__line-base">Puedo estar con una web</span><span class="statement__line-reveal" data-statement-line-fill><span class="statement__line-fill">Puedo estar con una web</span></span></span>
-				<span class="statement__line"><span class="statement__line-base">y al rato con un cartel,</span><span class="statement__line-reveal" data-statement-line-fill><span class="statement__line-fill">y al rato con un cartel,</span></span></span>
-				<span class="statement__line"><span class="statement__line-base">una publicación o detrás</span><span class="statement__line-reveal" data-statement-line-fill><span class="statement__line-fill">una publicación o detrás</span></span></span>
-				<span class="statement__line"><span class="statement__line-base">de la cámara.</span><span class="statement__line-reveal" data-statement-line-fill><span class="statement__line-fill">de la cámara.</span></span></span>
+				{copy.mobile.map((line) => <span class="statement__line"><span class="statement__line-base">{line}</span><span class="statement__line-reveal" data-statement-line-fill><span class="statement__line-fill">{line}</span></span></span>)}
 			</span>
 			</h2>
 		</div>

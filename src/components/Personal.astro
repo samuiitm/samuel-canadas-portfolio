@@ -1,48 +1,55 @@
 ---
+import { homeContent } from '../data/content';
+import { defaultLocale, type Locale } from '../lib/i18n';
+
+interface Props { locale?: Locale; }
+const { locale = defaultLocale } = Astro.props;
+const copy = homeContent[locale].personal;
+
 const tracks = [
-	{ number: '01', title: 'Gil', artist: 'Milo j, Trueno', quote: 'Todo puede pasar\nPero todo pasa, me dijo mamá', cover: '/images/personal/tracks/gil.jpg', spotifyUrl: 'https://open.spotify.com/track/5jgmQkVypORb3enASCxjYs' },
-	{ number: '02', title: 'PUMAS', artist: 'Milo j, Trueno', quote: 'Si me achino al sonreír, pues ser feliz nos ciega un poco', cover: '/images/personal/tracks/pumas.jpg', spotifyUrl: 'https://open.spotify.com/track/5Iu46UfunYa0I5CFGAW59y' },
-	{ number: '03', title: 'RETIRADA', artist: 'Milo j', quote: "Busco la tranquilidad porque sé que la felicida' es un momento", cover: '/images/personal/tracks/retirada.jpg', spotifyUrl: 'https://open.spotify.com/track/2m7Ev5rPlckRrn6HT2coGI' },
-	{ number: '04', title: '344', artist: 'Trueno', quote: 'La vida es entender que los mortales se equivocan', cover: '/images/personal/tracks/344.jpg', spotifyUrl: 'https://open.spotify.com/track/5lBGVYffaIHiCzL5yD3xXV' },
-	{ number: '05', title: 'Fruto', artist: 'Milo j, Bizarrap', quote: 'Debo buscar la paz en quien no reste', cover: '/images/personal/tracks/fruto.jpg', spotifyUrl: 'https://open.spotify.com/track/4SW9gHnW8NfKOdqmh0ij45' },
-	{ number: '06', title: 'ALIOLI', artist: 'Milo j', quote: 'Que sea solo tu mente la que reine\nHay que saber aprenderlo sin que te lo enseñen', cover: '/images/personal/tracks/alioli.jpg', spotifyUrl: 'https://open.spotify.com/track/1hhyV6nlmpFTw74wBoe3Qw' },
-	{ number: '07', title: 'ANTES DE LOS 20', artist: 'Milo j', quote: 'Ahora evito enojarme\nBuscás la paz cuando sos gigante\nAhora me escapo de malos tratos\nNo todo es bueno por interesante', cover: '/images/personal/tracks/antes-de-los-20.jpg', spotifyUrl: 'https://open.spotify.com/track/5QMEKllxu4zaFMCGJdmacD' },
-	{ number: '08', title: 'FLAKITO', artist: 'Quevedo', quote: "Hay que aprovechar que son cortos los buenos tiempos\nQue nos duela la barriga de reír\nCuando llegue la mala no rendirse antes de tiempo\nLos momentos pa' algo tienen que servir\nLos malos pa' saber a dónde no volver\nY los buenos pa' saber hacia dónde ir", cover: '/images/personal/tracks/flakito.jpg', spotifyUrl: 'https://open.spotify.com/track/32oPtn23E4YAoSsGSNm3J3' },
-	{ number: '09', title: 'HIJO DE VOLCÁN', artist: 'Quevedo, Los Gofiones', quote: 'Y para mí, ser yo mismo nunca será un movimiento', cover: '/images/personal/tracks/hijo-de-volcan.jpg', spotifyUrl: 'https://open.spotify.com/track/2puLgkBRJq1qCeKizK8NDK' },
-	{ number: '10', title: 'NI CARLOS NI JOSE', artist: 'Milo j', quote: 'Tiro un shout out para los que son seres de luz\nY hacen mi cielo más azul\nOjalá me hubiesen visto crecer\nToy más alto, tengo más grave la voz', cover: '/images/personal/tracks/ni-carlos-ni-jose.jpg', spotifyUrl: 'https://open.spotify.com/track/4FoVEm3sutqSnOCogrSIhc' },
-	{ number: '11', title: 'HIPPIE', artist: 'Milo j', quote: 'Qué lindo y raro es el destino, cuando escribe no destiñe\nNi distingue entre un tarado y un buen pibe', cover: '/images/personal/tracks/hippie.jpg', spotifyUrl: 'https://open.spotify.com/track/1IwzXenIbsI1WA8PSiStUn' },
-	{ number: '12', title: 'Barro', artist: 'Duki', quote: 'La magia siempre estuvo dentro de mi cabeza\nCambié mi falta de aire por aire de grandeza\nY pensar que no quería salir de mi pieza', cover: '/images/personal/tracks/barro.jpg', spotifyUrl: 'https://open.spotify.com/track/7k59eQ9b5KXWUNQIMrA7nI' },
-	{ number: '13', title: 'buen día portación de rostro', artist: 'Milo j', quote: 'Hoy mato y muero en mi verdad\nTengo la virtud de sentirme bien conmigo', cover: '/images/personal/tracks/buen-dia.jpg', spotifyUrl: 'https://open.spotify.com/track/11PKDQQMsqNZ4sfefZmfRi' },
-	{ number: '14', title: 'Penas de Antaño', artist: 'Milo j, Bizarrap', quote: "No es fácil ser tan sincero\nY meno' donde la realidad les asusta\nY sí, da miedo, pero disfruto la vida\nY ahora más que nunca", cover: '/images/personal/tracks/penas-de-antano.jpg', spotifyUrl: 'https://open.spotify.com/track/4zYHsmc2V9RyR8eOA0mlx6' },
+	{ number: '01', title: 'Gil', artist: 'Milo j, Trueno', quote: 'Todo puede pasar\nPero todo pasa, me dijo mamá', quoteEn: 'Anything can happen\nBut everything passes, Mom told me', cover: '/images/personal/tracks/gil.jpg', spotifyUrl: 'https://open.spotify.com/track/5jgmQkVypORb3enASCxjYs' },
+	{ number: '02', title: 'PUMAS', artist: 'Milo j, Trueno', quote: 'Si me achino al sonreír, pues ser feliz nos ciega un poco', quoteEn: 'If my eyes narrow when I smile, it is because happiness blinds us a little', cover: '/images/personal/tracks/pumas.jpg', spotifyUrl: 'https://open.spotify.com/track/5Iu46UfunYa0I5CFGAW59y' },
+	{ number: '03', title: 'RETIRADA', artist: 'Milo j', quote: "Busco la tranquilidad porque sé que la felicida' es un momento", quoteEn: 'I look for peace because I know happiness only lasts a moment', cover: '/images/personal/tracks/retirada.jpg', spotifyUrl: 'https://open.spotify.com/track/2m7Ev5rPlckRrn6HT2coGI' },
+	{ number: '04', title: '344', artist: 'Trueno', quote: 'La vida es entender que los mortales se equivocan', quoteEn: 'Life is understanding that mortals make mistakes', cover: '/images/personal/tracks/344.jpg', spotifyUrl: 'https://open.spotify.com/track/5lBGVYffaIHiCzL5yD3xXV' },
+	{ number: '05', title: 'Fruto', artist: 'Milo j, Bizarrap', quote: 'Debo buscar la paz en quien no reste', quoteEn: 'I must find peace in someone who does not bring me down', cover: '/images/personal/tracks/fruto.jpg', spotifyUrl: 'https://open.spotify.com/track/4SW9gHnW8NfKOdqmh0ij45' },
+	{ number: '06', title: 'ALIOLI', artist: 'Milo j', quote: 'Que sea solo tu mente la que reine\nHay que saber aprenderlo sin que te lo enseñen', quoteEn: 'Let your mind be the only thing that rules\nYou have to learn it without being taught', cover: '/images/personal/tracks/alioli.jpg', spotifyUrl: 'https://open.spotify.com/track/1hhyV6nlmpFTw74wBoe3Qw' },
+	{ number: '07', title: 'ANTES DE LOS 20', artist: 'Milo j', quote: 'Ahora evito enojarme\nBuscás la paz cuando sos gigante\nAhora me escapo de malos tratos\nNo todo es bueno por interesante', quoteEn: 'Now I try not to get angry\nYou seek peace once you have grown strong\nNow I walk away from mistreatment\nNot everything interesting is good', cover: '/images/personal/tracks/antes-de-los-20.jpg', spotifyUrl: 'https://open.spotify.com/track/5QMEKllxu4zaFMCGJdmacD' },
+	{ number: '08', title: 'FLAKITO', artist: 'Quevedo', quote: "Hay que aprovechar que son cortos los buenos tiempos\nQue nos duela la barriga de reír\nCuando llegue la mala no rendirse antes de tiempo\nLos momentos pa' algo tienen que servir\nLos malos pa' saber a dónde no volver\nY los buenos pa' saber hacia dónde ir", quoteEn: 'Make the most of the good times, because they do not last long\nLaugh until our stomachs hurt\nWhen the hard times come, do not give up too soon\nEvery moment has a purpose\nThe bad ones show you where not to return\nAnd the good ones show you where to go', cover: '/images/personal/tracks/flakito.jpg', spotifyUrl: 'https://open.spotify.com/track/32oPtn23E4YAoSsGSNm3J3' },
+	{ number: '09', title: 'HIJO DE VOLCÁN', artist: 'Quevedo, Los Gofiones', quote: 'Y para mí, ser yo mismo nunca será un movimiento', quoteEn: 'And for me, being myself will never be a movement', cover: '/images/personal/tracks/hijo-de-volcan.jpg', spotifyUrl: 'https://open.spotify.com/track/2puLgkBRJq1qCeKizK8NDK' },
+	{ number: '10', title: 'NI CARLOS NI JOSE', artist: 'Milo j', quote: 'Tiro un shout out para los que son seres de luz\nY hacen mi cielo más azul\nOjalá me hubiesen visto crecer\nToy más alto, tengo más grave la voz', quoteEn: 'A shout-out to those who are beings of light\nAnd make my sky bluer\nI wish they could have watched me grow\nI am taller now, my voice is deeper', cover: '/images/personal/tracks/ni-carlos-ni-jose.jpg', spotifyUrl: 'https://open.spotify.com/track/4FoVEm3sutqSnOCogrSIhc' },
+	{ number: '11', title: 'HIPPIE', artist: 'Milo j', quote: 'Qué lindo y raro es el destino, cuando escribe no destiñe\nNi distingue entre un tarado y un buen pibe', quoteEn: 'How beautiful and strange fate can be; when it writes, the ink never fades\nNor does it tell a fool from a good kid', cover: '/images/personal/tracks/hippie.jpg', spotifyUrl: 'https://open.spotify.com/track/1IwzXenIbsI1WA8PSiStUn' },
+	{ number: '12', title: 'Barro', artist: 'Duki', quote: 'La magia siempre estuvo dentro de mi cabeza\nCambié mi falta de aire por aire de grandeza\nY pensar que no quería salir de mi pieza', quoteEn: 'The magic was always inside my head\nI traded my shortness of breath for an air of greatness\nAnd to think I once did not want to leave my room', cover: '/images/personal/tracks/barro.jpg', spotifyUrl: 'https://open.spotify.com/track/7k59eQ9b5KXWUNQIMrA7nI' },
+	{ number: '13', title: 'buen día portación de rostro', artist: 'Milo j', quote: 'Hoy mato y muero en mi verdad\nTengo la virtud de sentirme bien conmigo', quoteEn: 'Today I kill and die for my truth\nI have the gift of feeling good about who I am', cover: '/images/personal/tracks/buen-dia.jpg', spotifyUrl: 'https://open.spotify.com/track/11PKDQQMsqNZ4sfefZmfRi' },
+	{ number: '14', title: 'Penas de Antaño', artist: 'Milo j, Bizarrap', quote: "No es fácil ser tan sincero\nY meno' donde la realidad les asusta\nY sí, da miedo, pero disfruto la vida\nY ahora más que nunca", quoteEn: 'It is not easy to be this honest\nEven less so where reality scares them\nAnd yes, it is frightening, but I enjoy life\nNow more than ever', cover: '/images/personal/tracks/penas-de-antano.jpg', spotifyUrl: 'https://open.spotify.com/track/4zYHsmc2V9RyR8eOA0mlx6' },
 ];
 const selectedTrack = tracks[0];
 ---
 
-<section class="personal" id="personal" aria-labelledby="personal-title" data-personal>
+<section class="personal" id="personal" aria-labelledby="personal-title" data-personal data-language-section="cientoonce" data-cover-alt-prefix={copy.coverAltPrefix} data-selected-song={copy.selectedSong} data-show-phrase={copy.showPhrase} data-hide-phrase={copy.hidePhrase}>
 	<div class="personal__sticky">
 	<header class="personal__intro container-wide">
-		<p class="eyebrow">04 — Fuera del trabajo</p>
-		<h2 id="personal-title">Muchas ideas empiezan con música.</h2>
+		<p class="eyebrow">{copy.eyebrow}</p>
+		<h2 id="personal-title">{copy.title}</h2>
 	</header>
 
 	<div class="cientoonce container-wide">
 		<div class="playlist-app">
 			<header class="playlist-app__header">
-				<figure class="playlist-app__cover"><img src="/images/personal/cientoonce-cover.jpg" alt="Samuel de espaldas caminando por un puente urbano bajo un cielo gris" width="853" height="853" loading="lazy" decoding="async" /></figure>
+				<figure class="playlist-app__cover"><img src="/images/personal/cientoonce-cover.jpg" alt={copy.coverAlt} width="853" height="853" loading="lazy" decoding="async" /></figure>
 				<div class="playlist-app__identity">
-					<p class="playlist-app__label">Playlist personal</p>
+					<p class="playlist-app__label">{copy.playlistLabel}</p>
 					<h3>cientoonce</h3>
-					<p class="playlist-app__description">Canciones y letras que por alguna razón siempre termino recordando.</p>
-					<p class="playlist-app__metadata"><strong>Samuel</strong><span aria-hidden="true">·</span><span>14 tracks</span></p>
+					<p class="playlist-app__description">{copy.description}</p>
+					<p class="playlist-app__metadata"><strong>Samuel</strong><span aria-hidden="true">·</span><span>{copy.tracks}</span></p>
 				</div>
 			</header>
 
 			<div class="playlist-app__content">
 				<div class="tracklist__viewport" data-tracklist-viewport>
-					<div class="tracklist__heading" aria-hidden="true"><span>#</span><span>Título</span><span>Artista</span></div>
-				<div class="tracklist" data-tracklist-rail role="group" aria-label="Canciones de la playlist cientoonce">
+					<div class="tracklist__heading" aria-hidden="true"><span>#</span><span>{copy.titleColumn}</span><span>{copy.artistColumn}</span></div>
+				<div class="tracklist" data-tracklist-rail role="group" aria-label={copy.tracklistLabel}>
 					{tracks.map((track, index) => (
-						<button type="button" class:list={['track-row', { 'is-selected': index === 0 }]} data-track data-number={track.number} data-title={track.title} data-artist={track.artist} data-quote={track.quote} data-cover={track.cover} data-spotify-url={track.spotifyUrl} aria-pressed={index === 0 ? 'true' : 'false'}>
+						<button type="button" class:list={['track-row', { 'is-selected': index === 0 }]} data-track data-number={track.number} data-title={track.title} data-artist={track.artist} data-quote={track.quote} data-quote-translation={locale === 'en' ? track.quoteEn : ''} data-cover={track.cover} data-spotify-url={track.spotifyUrl} aria-pressed={index === 0 ? 'true' : 'false'}>
 							<span class="track-row__number">{track.number}</span>
 							<img class="track-row__cover" src={track.cover} alt="" width="48" height="48" loading="lazy" decoding="async" />
 							<span class="track-row__title">{track.title}</span>
@@ -53,14 +60,17 @@ const selectedTrack = tracks[0];
 				</div>
 				</div>
 
-				<aside class="now-playing" aria-label="Canción seleccionada">
+				<aside class="now-playing" aria-label={copy.selectedTrack}>
 					<div class="now-playing__content" data-detail-content aria-live="polite">
-						<p class="now-playing__eyebrow"><span>Ahora seleccionada</span><span data-selected-number>{selectedTrack.number}</span></p>
-						<img class="now-playing__cover" data-selected-cover src={selectedTrack.cover} alt={`Portada oficial de ${selectedTrack.title}`} width="640" height="640" loading="lazy" decoding="async" />
+						<p class="now-playing__eyebrow"><span>{copy.nowSelected}</span><span data-selected-number>{selectedTrack.number}</span></p>
+						<img class="now-playing__cover" data-selected-cover src={selectedTrack.cover} alt={`${copy.coverAltPrefix} ${selectedTrack.title}`} width="640" height="640" loading="lazy" decoding="async" />
 						<div class="now-playing__meta"><h4 data-selected-title>{selectedTrack.title}</h4><p data-selected-artist>{selectedTrack.artist}</p></div>
-						<button class="now-playing__phrase-toggle" type="button" data-phrase-toggle aria-expanded="false">Ver frase <span aria-hidden="true">↓</span></button>
-						<blockquote data-selected-quote>{selectedTrack.quote}</blockquote>
-						<a class="now-playing__spotify" data-selected-link href={selectedTrack.spotifyUrl} target="_blank" rel="noreferrer"><span class="now-playing__play" aria-hidden="true">▶</span><span>Abrir en Spotify</span><span aria-hidden="true">↗</span></a>
+						<button class="now-playing__phrase-toggle" type="button" data-phrase-toggle aria-expanded="false">{copy.showPhrase} <span aria-hidden="true">↓</span></button>
+						<blockquote data-selected-quote>
+							<span class="now-playing__quote-original" data-selected-quote-original>{selectedTrack.quote}</span>
+							{locale === 'en' && <span class="now-playing__quote-translation" data-selected-quote-translation>({selectedTrack.quoteEn})</span>}
+						</blockquote>
+						<a class="now-playing__spotify" data-selected-link href={selectedTrack.spotifyUrl} target="_blank" rel="noreferrer"><span class="now-playing__play" aria-hidden="true">▶</span><span>{copy.openSpotify}</span><span aria-hidden="true">↗</span></a>
 					</div>
 				</aside>
 			</div>
@@ -72,12 +82,17 @@ const selectedTrack = tracks[0];
 <script>
 	const personal = document.querySelector<HTMLElement>('[data-personal]');
 	if (personal) {
+		const coverAltPrefix = personal.dataset.coverAltPrefix ?? '';
+		const selectedSong = personal.dataset.selectedSong ?? '';
+		const showPhrase = personal.dataset.showPhrase ?? '';
+		const hidePhrase = personal.dataset.hidePhrase ?? '';
 		const buttons = personal.querySelectorAll<HTMLButtonElement>('[data-track]');
 		const detail = personal.querySelector<HTMLElement>('[data-detail-content]');
 		const number = personal.querySelector<HTMLElement>('[data-selected-number]');
 		const title = personal.querySelector<HTMLElement>('[data-selected-title]');
 		const artist = personal.querySelector<HTMLElement>('[data-selected-artist]');
-		const quote = personal.querySelector<HTMLElement>('[data-selected-quote]');
+		const quoteOriginal = personal.querySelector<HTMLElement>('[data-selected-quote-original]');
+		const quoteTranslation = personal.querySelector<HTMLElement>('[data-selected-quote-translation]');
 		const cover = personal.querySelector<HTMLImageElement>('[data-selected-cover]');
 		const link = personal.querySelector<HTMLAnchorElement>('[data-selected-link]');
 		const viewport = personal.querySelector<HTMLElement>('[data-tracklist-viewport]');
@@ -92,8 +107,9 @@ const selectedTrack = tracks[0];
 			if (number) number.textContent = button.dataset.number ?? '';
 			if (title) title.textContent = button.dataset.title ?? '';
 			if (artist) artist.textContent = button.dataset.artist ?? '';
-			if (quote) quote.textContent = button.dataset.quote ?? '';
-			if (cover) { cover.src = button.dataset.cover ?? ''; cover.alt = `Portada oficial de ${button.dataset.title ?? 'la canción seleccionada'}`; }
+			if (quoteOriginal) quoteOriginal.textContent = button.dataset.quote ?? '';
+			if (quoteTranslation) quoteTranslation.textContent = `(${button.dataset.quoteTranslation ?? ''})`;
+			if (cover) { cover.src = button.dataset.cover ?? ''; cover.alt = `${coverAltPrefix} ${button.dataset.title ?? selectedSong}`; }
 			if (link) link.href = button.dataset.spotifyUrl ?? '#';
 		};
 
@@ -116,7 +132,7 @@ const selectedTrack = tracks[0];
 		phraseToggle?.addEventListener('click', () => {
 			const isOpen = personal.classList.toggle('is-phrase-open');
 			phraseToggle.setAttribute('aria-expanded', String(isOpen));
-			phraseToggle.firstChild!.textContent = isOpen ? 'Ocultar frase ' : 'Ver frase ';
+			phraseToggle.firstChild!.textContent = `${isOpen ? hidePhrase : showPhrase} `;
 		});
 
 		const updatePlaylistScroll = () => {

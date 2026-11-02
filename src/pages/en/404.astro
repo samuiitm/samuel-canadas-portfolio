@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+---
+
+<BaseLayout
+	title="Page not found | Samuel Cañadas"
+	description="The page you are looking for does not exist."
+	lang="en"
+	canonicalPath="/en/404/"
+	alternates={{ es: '/404/', en: '/en/404/', xDefault: '/404/' }}
+	robots="noindex, nofollow"
+>
+	<Header locale="en" />
+	<main class="not-found container-normal" data-language-section="not-found">
+		<p class="eyebrow">404 — Page not found</p>
+		<h1>This page is not here.</h1>
+		<p>The link may have changed, or the address may be incorrect.</p>
+		<a href="/en/">Back to the portfolio <span aria-hidden="true">→</span></a>
+	</main>
+</BaseLayout>

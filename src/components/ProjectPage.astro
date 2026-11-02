@@ -1,28 +1,41 @@
 ---
 import type { PortfolioProject } from '../data/projects';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getHomePath, getProjectPath, type Locale } from '../lib/i18n';
 import Header from './Header.astro';
 
 interface Props {
 	project: PortfolioProject;
+	locale: Locale;
 }
 
-const { project } = Astro.props;
-const canonicalPath = `/proyectos/${project.slug}/`;
+const { project, locale } = Astro.props;
+const copy = locale === 'en' ? {
+	home: 'Home', work: 'Work', caseStudy: 'Case study', back: 'Back to projects', logo: 'Logo of', breadcrumb: 'Breadcrumb',
+} : {
+	home: 'Inicio', work: 'Proyectos', caseStudy: 'Caso de estudio', back: 'Volver a proyectos', logo: 'Logo de', breadcrumb: 'Ruta de navegación',
+};
+const canonicalPath = getProjectPath(project.slug, locale);
+const homePath = getHomePath(locale);
+const workPath = `${homePath}#work`;
+const spanishPath = getProjectPath(project.slug, 'es');
+const englishPath = getProjectPath(project.slug, 'en');
 const canonicalUrl = `https://samuelcanadas.com${canonicalPath}`;
+const pageId = `${canonicalUrl}#webpage`;
 const breadcrumbId = `${canonicalUrl}#breadcrumb`;
-const workId = `${canonicalUrl}#project`;
+const workId = `https://samuelcanadas.com/#project-${project.slug}`;
+const primaryProjectUrl = `https://samuelcanadas.com/proyectos/${project.slug}/`;
 
 const structuredData = {
 	'@context': 'https://schema.org',
 	'@graph': [
 		{
 			'@type': 'WebPage',
-			'@id': `${canonicalUrl}#webpage`,
+			'@id': pageId,
 			url: canonicalUrl,
 			name: project.pageTitle,
 			description: project.metaDescription,
-			inLanguage: 'es',
+			inLanguage: locale,
 			isPartOf: { '@id': 'https://samuelcanadas.com/#website' },
 			breadcrumb: { '@id': breadcrumbId },
 			mainEntity: { '@id': workId },
@@ -30,18 +43,21 @@ const structuredData = {
 		{
 			'@type': 'BreadcrumbList',
 			'@id': breadcrumbId,
+			inLanguage: locale,
 			itemListElement: [
-				{ '@type': 'ListItem', position: 1, name: 'Inicio', item: 'https://samuelcanadas.com/' },
-				{ '@type': 'ListItem', position: 2, name: 'Proyectos', item: 'https://samuelcanadas.com/#work' },
+				{ '@type': 'ListItem', position: 1, name: copy.home, item: new URL(homePath, 'https://samuelcanadas.com').href },
+				{ '@type': 'ListItem', position: 2, name: copy.work, item: new URL(workPath, 'https://samuelcanadas.com').href },
 				{ '@type': 'ListItem', position: 3, name: project.name, item: canonicalUrl },
 			],
 		},
 		{
 			'@type': 'CreativeWork',
 			'@id': workId,
+			url: primaryProjectUrl,
+			mainEntityOfPage: { '@id': pageId },
 			name: project.name,
 			description: project.metaDescription,
-			url: canonicalUrl,
+			inLanguage: locale,
 			image: new URL(project.ogImage, 'https://samuelcanadas.com').href,
 			author: { '@id': 'https://samuelcanadas.com/#person' },
 			sameAs: project.officialUrl,
@@ -53,7 +69,9 @@ const structuredData = {
 <BaseLayout
 	title={project.pageTitle}
 	description={project.metaDescription}
+	lang={locale}
 	canonicalPath={canonicalPath}
+	alternates={{ es: spanishPath, en: englishPath, xDefault: spanishPath }}
 	image={project.ogImage}
 	imageWidth={project.ogImageWidth}
 	imageHeight={project.ogImageHeight}
@@ -61,20 +79,20 @@ const structuredData = {
 	type="article"
 	structuredData={structuredData}
 >
-	<Header />
-	<main class:list={['case-page', `case-page--${project.id}`]}>
+	<Header locale={locale} />
+	<main class:list={['case-page', `case-page--${project.id}`]} data-language-section="project">
 		<article>
 			<header class="case-page__hero container-wide">
-				<nav class="case-page__breadcrumb" aria-label="Breadcrumb">
+				<nav class="case-page__breadcrumb" aria-label={copy.breadcrumb}>
 					<ol>
-						<li><a href="/">Inicio</a></li>
-						<li><a href="/#work">Proyectos</a></li>
+						<li><a href={homePath}>{copy.home}</a></li>
+						<li><a href={workPath}>{copy.work}</a></li>
 						<li aria-current="page">{project.name}</li>
 					</ol>
 				</nav>
 				<div class="case-page__heading">
 					<div>
-						<p class="eyebrow">{project.index} — Caso de estudio</p>
+						<p class="eyebrow">{project.index} — {copy.caseStudy}</p>
 						<h1>{project.name}</h1>
 					</div>
 					<div class="case-page__summary">
@@ -84,7 +102,7 @@ const structuredData = {
 				</div>
 				<figure class="case-page__cover">
 					<img src={project.cover} alt={project.coverAlt} width={project.coverWidth} height={project.coverHeight} loading="eager" decoding="async" fetchpriority="high" />
-					<img class="case-page__logo" src={project.logo} alt={`Logo de ${project.name}`} width={project.logoWidth} height={project.logoHeight} decoding="async" />
+					<img class="case-page__logo" src={project.logo} alt={`${copy.logo} ${project.name}`} width={project.logoWidth} height={project.logoHeight} decoding="async" />
 				</figure>
 			</header>
 
@@ -104,7 +122,7 @@ const structuredData = {
 			</div>
 
 			<footer class="case-page__footer container-wide">
-				<a href="/#work">← Volver a proyectos</a>
+				<a href={workPath}>← {copy.back}</a>
 				<a href={project.officialUrl} target="_blank" rel="noopener noreferrer">{project.officialLabel} <span aria-hidden="true">↗</span></a>
 			</footer>
 		</article>

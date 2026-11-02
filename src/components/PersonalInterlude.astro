@@ -1,4 +1,13 @@
-<section class="personal-interlude" id="personal-interlude" aria-label="The Last of Us y contacto" data-personal-interlude>
+---
+import { homeContent } from '../data/content';
+import { defaultLocale, type Locale } from '../lib/i18n';
+
+interface Props { locale?: Locale; }
+const { locale = defaultLocale } = Astro.props;
+const copy = homeContent[locale].contact;
+---
+
+<section class="personal-interlude" id="personal-interlude" aria-label={copy.sectionLabel} data-personal-interlude data-language-section="contact">
 	<span class="personal-interlude__contact-anchor" id="contact" aria-hidden="true"></span>
 	<div class="personal-interlude__sticky">
 		<div class="personal-interlude__media" aria-hidden="true">
@@ -8,27 +17,27 @@
 		</div>
 		<div class="personal-interlude__contact-shade" data-contact-shade aria-hidden="true"></div>
 		<blockquote class="personal-interlude__quote" data-interlude-quote>
-			<span class="personal-interlude__line personal-interlude__line--one">“No importa lo que pase,</span>
-			<span class="personal-interlude__line personal-interlude__line--two">siempre encuentras algo<br />por lo que luchar.”</span>
+			<span class="personal-interlude__line personal-interlude__line--one">{copy.quoteOne}</span>
+			<span class="personal-interlude__line personal-interlude__line--two">{copy.quoteTwo}<br />{copy.quoteThree}</span>
 			<cite class="personal-interlude__attribution">— Joel Miller</cite>
 		</blockquote>
 		<div class="interlude-contact" aria-labelledby="contact-title" data-interlude-contact inert>
 			<div class="interlude-contact__intro">
-				<p class="eyebrow interlude-contact__eyebrow" data-contact-eyebrow>05 — Contacto</p>
-				<h2 id="contact-title" data-contact-title>¿Hablamos?</h2>
-				<p class="interlude-contact__subtitle" data-contact-subtitle>Si tienes una idea, una oportunidad o simplemente quieres conocer mejor mi trabajo, escríbeme.</p>
-				<a class="interlude-contact__cv" href="/Samuel-Canadas-CV.pdf" download="Samuel-Canadas-CV.pdf" aria-label="Descargar el CV de Samuel Cañadas en PDF" data-contact-cv>
-					<span>Descargar CV</span><i aria-hidden="true">↓</i>
+				<p class="eyebrow interlude-contact__eyebrow" data-contact-eyebrow>{copy.eyebrow}</p>
+				<h2 id="contact-title" data-contact-title>{copy.title}</h2>
+				<p class="interlude-contact__subtitle" data-contact-subtitle>{copy.subtitle}</p>
+				<a class="interlude-contact__cv" href="/Samuel-Canadas-CV.pdf" download="Samuel-Canadas-CV.pdf" aria-label={copy.cvLabel} data-contact-cv>
+					<span>{copy.cv}</span><i aria-hidden="true">↓</i>
 				</a>
 			</div>
-			<nav class="interlude-contact__links" aria-label="Vías de contacto" data-contact-links>
-				<a class="interlude-contact__link" data-contact-link href="mailto:samuelcanadas2711@gmail.com" aria-label="Enviar un email a samuelcanadas2711@gmail.com"><span>Email</span><small>samuelcanadas2711@gmail.com</small></a>
-				<a class="interlude-contact__link" data-contact-link href="https://www.linkedin.com/in/scanadas" target="_blank" rel="me noopener noreferrer" aria-label="LinkedIn de Samuel Cañadas, se abre en una pestaña nueva"><span>LinkedIn</span><i aria-hidden="true">↗</i></a>
-				<a class="interlude-contact__link" data-contact-link href="https://github.com/samuiitm" target="_blank" rel="me noopener noreferrer" aria-label="GitHub de Samuel Cañadas, se abre en una pestaña nueva"><span>GitHub</span><i aria-hidden="true">↗</i></a>
+			<nav class="interlude-contact__links" aria-label={copy.linksLabel} data-contact-links>
+				<a class="interlude-contact__link" data-contact-link href="mailto:samuelcanadas2711@gmail.com" aria-label={copy.emailLabel}><span>Email</span><small>samuelcanadas2711@gmail.com</small></a>
+				<a class="interlude-contact__link" data-contact-link href="https://www.linkedin.com/in/scanadas" target="_blank" rel="me noopener noreferrer" aria-label={copy.linkedInLabel}><span>LinkedIn</span><i aria-hidden="true">↗</i></a>
+				<a class="interlude-contact__link" data-contact-link href="https://github.com/samuiitm" target="_blank" rel="me noopener noreferrer" aria-label={copy.githubLabel}><span>GitHub</span><i aria-hidden="true">↗</i></a>
 			</nav>
 			<footer class="interlude-contact__footer" data-contact-footer>
 				<span>Samuel Cañadas · 2026/27</span>
-				<a href="#top" aria-label="Volver al inicio de la página">↑ Volver arriba</a>
+				<a href="#top" aria-label={copy.backToTopLabel}>↑ {copy.backToTop}</a>
 			</footer>
 		</div>
 	</div>

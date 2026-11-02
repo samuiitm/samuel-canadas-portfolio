@@ -2,7 +2,7 @@
 import ProjectPage from '../../../components/ProjectPage.astro';
 import { getProject } from '../../../data/projects';
 
-const project = getProject('nfl');
+const project = getProject('nfl', 'es');
 ---
 
-<ProjectPage project={project} />
+<ProjectPage project={project} locale="es" />

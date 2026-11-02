@@ -7,10 +7,11 @@ import Header from '../components/Header.astro';
 	title="Página no encontrada | Samuel Cañadas"
 	description="La página que buscas no existe."
 	canonicalPath="/404/"
+	alternates={{ es: '/404/', en: '/en/404/', xDefault: '/404/' }}
 	robots="noindex, nofollow"
 >
-	<Header />
-	<main class="not-found container-normal">
+	<Header locale="es" />
+	<main class="not-found container-normal" data-language-section="not-found">
 		<p class="eyebrow">404 — Página no encontrada</p>
 		<h1>Esta página no está aquí.</h1>
 		<p>Puede que el enlace haya cambiado o que la dirección no sea correcta.</p>
